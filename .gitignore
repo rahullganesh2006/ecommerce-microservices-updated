@@ -1,0 +1,92 @@
+# ============================
+# Python
+# ============================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Compiled extensions
+*.so
+*.pyd
+*.dll
+
+# ============================
+# Virtual Environments
+# ============================
+venv/
+.venv/
+env/
+ENV/
+
+# ============================
+# Environment Variables
+# ============================
+.env
+.env.*
+
+# ============================
+# IDEs
+# ============================
+.vscode/
+.idea/
+
+# ============================
+# Python Build Files
+# ============================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ============================
+# Pytest
+# ============================
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ============================
+# Logs
+# ============================
+*.log
+
+# ============================
+# OS Files
+# ============================
+.DS_Store
+Thumbs.db
+
+# ============================
+# AWS Lambda
+# ============================
+layer/
+deployment/
+lambda_package/
+dependencies/
+python/
+
+*.zip
+
+# Ignore generated deployment archives
+lambda_function.zip
+dependencies.zip
+
+# ============================
+# AWS Credentials
+# ============================
+.aws/
+
+# ============================
+# Terraform (if used later)
+# ============================
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# ============================
+# Misc
+# ============================
+*.tmp
+*.bak
+*.swp
