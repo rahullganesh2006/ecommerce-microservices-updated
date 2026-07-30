@@ -23,7 +23,8 @@ class ProductRepository:
                 "description": product.description,
                 "category": product.category,
                 "price": Decimal(str(product.price)),
-                "stock": product.stock
+                "stock": product.stock,
+                "image": product.image if product.image else ""
             }
 
             table.put_item(Item=item)

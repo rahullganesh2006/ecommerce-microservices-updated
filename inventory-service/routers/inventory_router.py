@@ -6,8 +6,7 @@ from fastapi import Depends
 from fastapi.security import HTTPBearer
 from fastapi.security import HTTPAuthorizationCredentials
 
-from schemas.inventory_schema import InventoryCreate
-from schemas.inventory_schema import InventoryUpdate
+from schemas.inventory_schema import InventoryCreate, InventoryUpdate
 from services.inventory_service import InventoryService
 
 # JWT Security for Swagger
@@ -53,6 +52,20 @@ def get_all_inventory(
         "count": len(inventory),
         "data": inventory
     }
+
+
+@router.get("/product/{product_id}")
+def get_inventory_by_product(
+    product_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    inventory = InventoryService.get_inventory_by_product_id(product_id)
+    if inventory is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Inventory not found for this product"
+        )
+    return inventory
 
 
 @router.get("/{inventory_id}")
@@ -172,4 +185,32 @@ def release_stock(
     return {
         "message": "Reserved stock released",
         "data": released
+    }
+
+# -------------------------------
+# UNIQUE FEATURE 3
+# Confirm Stock
+# -------------------------------
+
+@router.post("/{inventory_id}/confirm")
+def confirm_stock(
+    inventory_id: str,
+    quantity: int,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+
+    confirmed = InventoryService.confirm_stock(
+        inventory_id,
+        quantity
+    )
+
+    if confirmed is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Inventory not found"
+        )
+
+    return {
+        "message": "Stock confirmed and permanently deducted",
+        "data": confirmed
     }

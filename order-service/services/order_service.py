@@ -13,7 +13,15 @@ class OrderService:
         if existing:
             return None
 
-        return OrderRepository.create_order(order)
+        created_item = OrderRepository.create_order(order)
+        if created_item:
+            from services.sns_publisher import SNSPublisher
+            from utils.logger import get_logger
+            logger = get_logger(__name__)
+            logger.info(f"Order created successfully: {created_item['order_id']}. Publishing event.")
+            SNSPublisher.publish_order_placed(created_item)
+            
+        return created_item
 
     @staticmethod
     def get_all_orders():

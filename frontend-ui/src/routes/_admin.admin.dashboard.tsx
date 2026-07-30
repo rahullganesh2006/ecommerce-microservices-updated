@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, ShoppingBag, Users, Package, TrendingUp, AlertTriangle } from "lucide-react";
+import { IndianRupee, ShoppingBag, Users, Package, TrendingUp, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { revenueByMonth, ordersByDay, orders, products } from "@/lib/mock-data";
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_admin/admin/dashboard")({
 });
 
 const KPIS = [
-  { l: "Total revenue", v: "$450,829", d: "+12.4%", i: DollarSign, tone: "text-success" },
+  { l: "Total revenue", v: "$450,829", d: "+12.4%", i: IndianRupee, tone: "text-success" },
   { l: "Total orders", v: "8,247", d: "+8.2%", i: ShoppingBag, tone: "text-success" },
   { l: "Today's orders", v: "127", d: "+4 vs yesterday", i: TrendingUp, tone: "text-success" },
   { l: "Active customers", v: "3,412", d: "+2.1%", i: Users, tone: "text-success" },
@@ -107,7 +107,7 @@ function AdminDashboard() {
                     <div className="text-xs text-muted-foreground">{o.customer}</div>
                   </div>
                   <Badge variant={o.status === "Delivered" ? "default" : o.status === "Cancelled" ? "destructive" : "secondary"}>{o.status}</Badge>
-                  <div className="text-sm font-semibold">${o.total}</div>
+                  <div className="text-sm font-semibold">₹{o.total}</div>
                 </div>
               ))}
             </div>

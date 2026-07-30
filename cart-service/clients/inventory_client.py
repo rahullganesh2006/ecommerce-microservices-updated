@@ -57,3 +57,39 @@ class InventoryClient:
                 status_code=500,
                 detail="Unable to connect to Inventory Service"
             )
+
+    @staticmethod
+    def reserve_stock(inventory_id: str, quantity: int, access_token: str):
+        url = f"{INVENTORY_SERVICE_URL}/inventory/{inventory_id}/reserve?quantity={quantity}"
+        headers = {"Authorization": f"Bearer {access_token}"}
+        try:
+            response = httpx.post(url, headers=headers, timeout=30)
+            if response.status_code == 200:
+                return response.json()
+            raise HTTPException(status_code=response.status_code, detail=response.text)
+        except httpx.RequestError:
+            raise HTTPException(status_code=500, detail="Unable to connect to Inventory Service")
+
+    @staticmethod
+    def release_stock(inventory_id: str, quantity: int, access_token: str):
+        url = f"{INVENTORY_SERVICE_URL}/inventory/{inventory_id}/release?quantity={quantity}"
+        headers = {"Authorization": f"Bearer {access_token}"}
+        try:
+            response = httpx.post(url, headers=headers, timeout=30)
+            if response.status_code == 200:
+                return response.json()
+            raise HTTPException(status_code=response.status_code, detail=response.text)
+        except httpx.RequestError:
+            raise HTTPException(status_code=500, detail="Unable to connect to Inventory Service")
+
+    @staticmethod
+    def confirm_stock(inventory_id: str, quantity: int, access_token: str):
+        url = f"{INVENTORY_SERVICE_URL}/inventory/{inventory_id}/confirm?quantity={quantity}"
+        headers = {"Authorization": f"Bearer {access_token}"}
+        try:
+            response = httpx.post(url, headers=headers, timeout=30)
+            if response.status_code == 200:
+                return response.json()
+            raise HTTPException(status_code=response.status_code, detail=response.text)
+        except httpx.RequestError:
+            raise HTTPException(status_code=500, detail="Unable to connect to Inventory Service")

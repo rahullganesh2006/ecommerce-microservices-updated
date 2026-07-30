@@ -9,6 +9,7 @@ class ProductCreate(BaseModel):
     category: str = Field(..., example="Electronics")
     price: float = Field(..., gt=0)
     stock: int = Field(..., ge=0)
+    image: Optional[str] = Field(None, example="https://example.com/image.jpg")
 
 
 class ProductUpdate(BaseModel):
@@ -17,6 +18,7 @@ class ProductUpdate(BaseModel):
     category: Optional[str] = None
     price: Optional[float] = Field(default=None, gt=0)
     stock: Optional[int] = Field(default=None, ge=0)
+    image: Optional[str] = None
 
 
 class ProductResponse(BaseModel):
@@ -26,3 +28,4 @@ class ProductResponse(BaseModel):
     category: str
     price: float
     stock: int
+    image: Optional[str] = None

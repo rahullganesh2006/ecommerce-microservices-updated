@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { products } from "@/lib/mock-data";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Package, Truck, Sparkles, Percent } from "lucide-react";
 import { useAuth } from "@/lib/auth-store";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
 
 export const Route = createFileRoute("/_customer/shop/")({
   component: CustomerHome,
@@ -13,6 +14,14 @@ export const Route = createFileRoute("/_customer/shop/")({
 
 function CustomerHome() {
   const user = useAuth((s) => s.user);
+  
+  const { data: response, isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: () => api.products.list(),
+  });
+
+  const products = response?.data || [];
+  
   const recommended = products.slice(0, 4);
   const latest = products.slice(4, 8);
 
@@ -67,9 +76,13 @@ function CustomerHome() {
           </div>
           <Button asChild variant="ghost" size="sm"><Link to="/shop/products">View all</Link></Button>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {recommended.map((p) => <ProductCard key={p.id} product={p} />)}
-        </div>
+        {isLoading ? (
+          <div className="py-12 text-center text-muted-foreground border border-dashed rounded-xl">Loading products...</div>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {recommended.map((p) => <ProductCard key={p.product_id} product={p} />)}
+          </div>
+        )}
       </section>
 
       <section>
@@ -77,9 +90,13 @@ function CustomerHome() {
           <h2 className="text-xl font-semibold tracking-tight">Latest arrivals</h2>
           <Button asChild variant="ghost" size="sm"><Link to="/shop/products">View all</Link></Button>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {latest.map((p) => <ProductCard key={p.id} product={p} />)}
-        </div>
+        {isLoading ? (
+           <div className="py-12 text-center text-muted-foreground border border-dashed rounded-xl">Loading products...</div>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {latest.map((p) => <ProductCard key={p.product_id} product={p} />)}
+          </div>
+        )}
       </section>
     </div>
   );

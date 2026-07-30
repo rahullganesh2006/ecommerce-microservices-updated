@@ -1,0 +1,17 @@
+# =========================================================================
+# Terraform Configuration Variables Template
+# Copy this file to "terraform.tfvars" and adjust parameters accordingly
+# =========================================================================
+
+# AWS Deployment settings
+aws_region      = "ap-southeast-1"
+resource_prefix = "rahull"
+
+# -------------------------------------------------------------------------
+# AWS Academy Sandbox Settings
+# -------------------------------------------------------------------------
+# Set use_existing_lab_role to true to bypass sandbox blocked IAM creations.
+# You must copy the LabRole ARN from the AWS console (IAM Roles screen).
+# -------------------------------------------------------------------------
+use_existing_lab_role = true
+existing_lab_role_arn = "arn:aws:sts::726101441380:assumed-role/AWSReservedSSO_AWS-Academy-Developer_d6d0c9c82c7bf980/rahull.ganesh@idp.com"

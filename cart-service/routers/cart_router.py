@@ -7,6 +7,7 @@ from security import get_current_user
 
 from schemas.cart_schema import AddToCartRequest
 from schemas.cart_schema import UpdateCartRequest
+from schemas.cart_schema import CheckoutRequest
 
 from services.cart_service import CartService
 
@@ -64,7 +65,8 @@ def update_cart(
 
     return CartService.update_cart(
         cart_id,
-        request.quantity
+        request.quantity,
+        user["access_token"]
     )
 
 
@@ -77,18 +79,24 @@ def remove_cart(
 ):
 
     return CartService.remove_cart(
-        cart_id
+        cart_id,
+        user["access_token"]
     )
 
 
-@router.get(
+@router.post(
     "/checkout/{customer_id}"
 )
 def checkout(
     customer_id: str,
+    request: CheckoutRequest,
     user=Depends(get_current_user)
 ):
 
     return CartService.checkout(
-        customer_id
+        customer_id,
+        request.payment_method,
+        request.shipping_address,
+        [item.dict() for item in request.items],
+        user["access_token"]
     )

@@ -1,17 +1,54 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { payments } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CreditCard, CheckCircle2, XCircle, RefreshCcw } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
+import { useMemo } from "react";
+import type { Payment } from "@/lib/types";
 
 export const Route = createFileRoute("/_admin/admin/payments")({
   component: AdminPayments,
 });
 
+function formatPaymentDate(payment_id: string, payment_time?: string) {
+  if (payment_time) {
+    try {
+      const d = new Date(payment_time);
+      if (!isNaN(d.getTime())) return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    } catch (e) {}
+  }
+  const parts = payment_id.split("-");
+  if (parts.length > 1) {
+    const ts = parseInt(parts[1], 10);
+    if (!isNaN(ts)) {
+      return new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    }
+  }
+  return "Unknown date";
+}
+
 function AdminPayments() {
-  const success = payments.filter((p) => p.status === "Success");
-  const failed = payments.filter((p) => p.status === "Failed");
+  const { data: response, isLoading } = useQuery({
+    queryKey: ["payments"],
+    queryFn: () => api.payments.list(),
+  });
+
+  const payments = useMemo(() => {
+    const raw: Payment[] = response?.data || [];
+    const groups = raw.reduce((acc, p) => {
+      if (!acc[p.order_id]) {
+        acc[p.order_id] = { ...p, amount: 0 };
+      }
+      acc[p.order_id].amount += p.amount;
+      return acc;
+    }, {} as Record<string, Payment>);
+    return Object.values(groups).sort((a, b) => b.payment_id.localeCompare(a.payment_id));
+  }, [response]);
+
+  const success = payments.filter((p) => p.payment_status === "Success" || p.payment_status === "Completed");
+  const failed = payments.filter((p) => p.payment_status === "Failed");
   const revenue = success.reduce((n, p) => n + p.amount, 0);
 
   return (
@@ -23,9 +60,9 @@ function AdminPayments() {
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
         {[
-          { l: "Revenue", v: `$${revenue}`, i: CreditCard, tone: "text-primary bg-primary/10" },
-          { l: "Successful", v: success.length, i: CheckCircle2, tone: "text-success bg-success/10" },
-          { l: "Failed", v: failed.length, i: XCircle, tone: "text-destructive bg-destructive/10" },
+          { l: "Revenue", v: `₹${revenue.toFixed(2)}`, i: CreditCard, tone: "text-primary bg-primary/10" },
+          { l: "Successful", v: isLoading ? "..." : success.length, i: CheckCircle2, tone: "text-success bg-success/10" },
+          { l: "Failed", v: isLoading ? "..." : failed.length, i: XCircle, tone: "text-destructive bg-destructive/10" },
         ].map((k) => (
           <Card key={k.l} className="shadow-soft"><CardContent className="p-5">
             <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${k.tone}`}><k.i className="h-4 w-4" /></div>
@@ -43,17 +80,25 @@ function AdminPayments() {
               <TableHead>Amount</TableHead><TableHead>Date</TableHead><TableHead>Status</TableHead>
             </TableRow></TableHeader>
             <TableBody>
-              {payments.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.id}</TableCell>
-                  <TableCell className="text-muted-foreground">{p.order}</TableCell>
-                  <TableCell>{p.method}</TableCell>
-                  <TableCell>${p.amount}</TableCell>
-                  <TableCell>{p.date}</TableCell>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground border-dashed border">Loading payments...</TableCell>
+                </TableRow>
+              ) : payments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground border-dashed border">No payments found</TableCell>
+                </TableRow>
+              ) : payments.map((p) => (
+                <TableRow key={p.payment_id}>
+                  <TableCell className="font-medium">{p.payment_id}</TableCell>
+                  <TableCell className="text-muted-foreground">{p.order_id}</TableCell>
+                  <TableCell>{p.payment_method}</TableCell>
+                  <TableCell>₹{p.amount}</TableCell>
+                  <TableCell>{formatPaymentDate(p.payment_id, p.payment_time)}</TableCell>
                   <TableCell>
-                    <Badge variant={p.status === "Success" ? "default" : p.status === "Failed" ? "destructive" : "secondary"}>
-                      {p.status === "Refunded" && <RefreshCcw className="mr-1 h-3 w-3" />}
-                      {p.status}
+                    <Badge variant={p.payment_status === "Success" || p.payment_status === "Completed" ? "default" : p.payment_status === "Failed" ? "destructive" : "secondary"}>
+                      {p.payment_status === "Refunded" && <RefreshCcw className="mr-1 h-3 w-3" />}
+                      {p.payment_status}
                     </Badge>
                   </TableCell>
                 </TableRow>

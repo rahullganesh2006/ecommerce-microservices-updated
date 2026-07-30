@@ -90,3 +90,16 @@ dependencies.zip
 *.tmp
 *.bak
 *.swp
+
+# Lambda packaged dependencies
+**/package/
+*.dist-info/
+site-packages/
+
+# Python cache
+**/__pycache__/
+*.pyc
+
+# Temporary files
+response.json
+scratch/

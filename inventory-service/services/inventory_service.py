@@ -4,6 +4,10 @@ from repositories.inventory_repository import InventoryRepository
 class InventoryService:
 
     @staticmethod
+    def get_inventory_by_product_id(product_id):
+        return InventoryRepository.get_inventory_by_product_id(product_id)
+
+    @staticmethod
     def create_inventory(inventory):
 
         existing = InventoryRepository.get_inventory_by_id(
@@ -57,3 +61,15 @@ class InventoryService:
         )
 
         return True
+
+    @staticmethod
+    def reserve_stock(inventory_id, quantity):
+        return InventoryRepository.reserve_stock(inventory_id, quantity)
+        
+    @staticmethod
+    def release_stock(inventory_id, quantity):
+        return InventoryRepository.release_stock(inventory_id, quantity)
+
+    @staticmethod
+    def confirm_stock(inventory_id, quantity):
+        return InventoryRepository.confirm_stock(inventory_id, quantity)

@@ -2,6 +2,9 @@ from decimal import Decimal
 from botocore.exceptions import ClientError
 
 from database import table
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class OrderRepository:
@@ -20,7 +23,7 @@ class OrderRepository:
             if "Item" in response:
                 return None
 
-            total_amount = order.quantity * order.unit_price
+            total_amount = sum(item.quantity * item.unit_price for item in order.items)
 
             item = {
 
@@ -28,13 +31,14 @@ class OrderRepository:
 
                 "customer_id": order.customer_id,
 
-                "product_id": order.product_id,
-
-                "quantity": order.quantity,
-
-                "unit_price": Decimal(
-                    str(order.unit_price)
-                ),
+                "items": [
+                    {
+                        "product_id": i.product_id,
+                        "product_name": i.product_name,
+                        "quantity": i.quantity,
+                        "unit_price": Decimal(str(i.unit_price))
+                    } for i in order.items
+                ],
 
                 "total_amount": Decimal(
                     str(total_amount)
@@ -53,10 +57,8 @@ class OrderRepository:
             return item
 
         except ClientError as e:
-
-            raise Exception(
-                e.response["Error"]["Message"]
-            )
+            logger.error(f"DynamoDB ClientError: {e}")
+            raise
 
     @staticmethod
     def get_all_orders():
@@ -68,10 +70,8 @@ class OrderRepository:
             return response.get("Items", [])
 
         except ClientError as e:
-
-            raise Exception(
-                e.response["Error"]["Message"]
-            )
+            logger.error(f"DynamoDB ClientError: {e}")
+            raise
 
     @staticmethod
     def get_order_by_id(order_id):
@@ -87,10 +87,8 @@ class OrderRepository:
             return response.get("Item")
 
         except ClientError as e:
-
-            raise Exception(
-                e.response["Error"]["Message"]
-            )
+            logger.error(f"DynamoDB ClientError: {e}")
+            raise
 
     @staticmethod
     def update_order(order_id, order):
@@ -112,15 +110,8 @@ class OrderRepository:
                 exclude_unset=True
             )
 
-            if "quantity" in update_data:
-
-                price = float(item["unit_price"])
-
-                update_data["total_amount"] = Decimal(
-                    str(
-                        update_data["quantity"] * price
-                    )
-                )
+            # Skip quantity update logic since it's now grouped
+            pass
 
             item.update(update_data)
 
@@ -129,10 +120,8 @@ class OrderRepository:
             return item
 
         except ClientError as e:
-
-            raise Exception(
-                e.response["Error"]["Message"]
-            )
+            logger.error(f"DynamoDB ClientError: {e}")
+            raise
 
     @staticmethod
     def delete_order(order_id):
@@ -157,7 +146,5 @@ class OrderRepository:
             return True
 
         except ClientError as e:
-
-            raise Exception(
-                e.response["Error"]["Message"]
-            )
+            logger.error(f"DynamoDB ClientError: {e}")
+            raise

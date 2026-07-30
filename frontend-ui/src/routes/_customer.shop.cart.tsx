@@ -47,7 +47,7 @@ function CartPage() {
                     <div className="flex-1">
                       <div className="text-xs text-muted-foreground">{i.product.category}</div>
                       <div className="font-medium">{i.product.name}</div>
-                      <div className="mt-1 text-sm font-semibold">${i.product.price}</div>
+                      <div className="mt-1 text-sm font-semibold">₹{i.product.price}</div>
                       <div className="mt-3 flex items-center gap-2">
                         <div className="flex items-center rounded-lg border border-border">
                           <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setQty(i.product.id, i.qty - 1)}><Minus className="h-3 w-3" /></Button>
@@ -59,7 +59,7 @@ function CartPage() {
                         </Button>
                       </div>
                     </div>
-                    <div className="text-right font-semibold">${(i.product.price * i.qty).toFixed(2)}</div>
+                    <div className="text-right font-semibold">₹{(i.product.price * i.qty).toFixed(2)}</div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -72,12 +72,12 @@ function CartPage() {
         <CardContent className="p-6">
           <h2 className="text-lg font-semibold">Order summary</h2>
           <div className="mt-4 space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">GST (18%)</span><span>${gst.toFixed(2)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">GST (18%)</span><span>₹{gst.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span>{shipping === 0 ? "Free" : `₹${shipping.toFixed(2)}`}</span></div>
           </div>
           <Separator className="my-4" />
-          <div className="flex justify-between text-base font-semibold"><span>Total</span><span>${total.toFixed(2)}</span></div>
+          <div className="flex justify-between text-base font-semibold"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
           <Button asChild className="mt-6 w-full bg-gradient-brand shadow-soft hover:shadow-elegant">
             <Link to="/shop/checkout">Checkout <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
           </Button>

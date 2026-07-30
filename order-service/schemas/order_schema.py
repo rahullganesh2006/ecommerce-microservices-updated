@@ -1,5 +1,12 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
+
+
+class OrderItem(BaseModel):
+    product_id: str
+    product_name: str
+    quantity: int = Field(..., ge=1)
+    unit_price: float = Field(..., gt=0)
 
 
 class OrderCreate(BaseModel):
@@ -8,11 +15,7 @@ class OrderCreate(BaseModel):
 
     customer_id: str = Field(..., example="CUS101")
 
-    product_id: str = Field(..., example="P101")
-
-    quantity: int = Field(..., ge=1)
-
-    unit_price: float = Field(..., gt=0)
+    items: List[OrderItem]
 
     shipping_address: str = Field(
         ...,
@@ -21,11 +24,6 @@ class OrderCreate(BaseModel):
 
 
 class OrderUpdate(BaseModel):
-
-    quantity: Optional[int] = Field(
-        default=None,
-        ge=1
-    )
 
     shipping_address: Optional[str] = None
 
@@ -38,11 +36,7 @@ class OrderResponse(BaseModel):
 
     customer_id: str
 
-    product_id: str
-
-    quantity: int
-
-    unit_price: float
+    items: List[OrderItem]
 
     total_amount: float
 

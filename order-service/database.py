@@ -1,16 +1,23 @@
-import os
 import boto3
+from config import config
+from utils.logger import get_logger
 
-if os.getenv("AWS_LAMBDA_FUNCTION_NAME") is None:
-    from dotenv import load_dotenv
-    load_dotenv(override=False)
+logger = get_logger(__name__)
 
-TABLE_NAME = os.getenv("TABLE_NAME")
-AWS_REGION = os.getenv("APP_REGION")
+if not config.is_lambda:
+    session = boto3.Session(
+        profile_name="Rahull Ganesh"
+    )
 
-dynamodb = boto3.resource(
-    "dynamodb",
-    region_name=AWS_REGION
-)
+    dynamodb = session.resource(
+        "dynamodb",
+        region_name=config.aws_region
+    )
+else:
+    dynamodb = boto3.resource(
+        "dynamodb",
+        region_name=config.aws_region
+    )
 
-table = dynamodb.Table(TABLE_NAME)
+table = dynamodb.Table(config.table_name)
+logger.info(f"Initialized DynamoDB table: {config.table_name} in region: {config.aws_region}")

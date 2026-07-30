@@ -33,6 +33,20 @@ class CartResponse(BaseModel):
     cart_total: float
 
 
+class CheckoutItem(BaseModel):
+    product_id: str
+    product_name: str
+    quantity: int
+    unit_price: float
+    total_price: float
+    cart_id: str | None = None
+
+class CheckoutRequest(BaseModel):
+    payment_method: str
+    shipping_address: str = "221 Baker Street, Apt 4B, San Francisco, 94103"
+    items: List[CheckoutItem] = []
+
+
 class CheckoutResponse(BaseModel):
 
     customer_id: str
