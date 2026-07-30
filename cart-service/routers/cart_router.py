@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import status
+from fastapi import BackgroundTasks
 
 from security import get_current_user
 
@@ -22,11 +23,15 @@ def add_to_cart(
     cart: AddToCartRequest,
     user=Depends(get_current_user)
 ):
-
-    created = CartService.create_cart(
-        cart,
-        user["access_token"]
-    )
+    print(f"DEBUG: Entering add_to_cart for cart: {cart}")
+    try:
+        created = CartService.create_cart(
+            cart,
+            user["access_token"]
+        )
+    except Exception as e:
+        print(f"DEBUG: Exception in CartService.create_cart: {str(e)}")
+        raise e
 
     if created is None:
 
@@ -90,6 +95,7 @@ def remove_cart(
 def checkout(
     customer_id: str,
     request: CheckoutRequest,
+    background_tasks: BackgroundTasks,
     user=Depends(get_current_user)
 ):
 
@@ -98,5 +104,6 @@ def checkout(
         request.payment_method,
         request.shipping_address,
         [item.dict() for item in request.items],
-        user["access_token"]
+        user["access_token"],
+        background_tasks
     )

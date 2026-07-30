@@ -6,7 +6,7 @@ from fastapi import HTTPException
 
 load_dotenv()
 
-INVENTORY_SERVICE_URL = os.getenv("INVENTORY_SERVICE_URL")
+INVENTORY_SERVICE_URL = os.getenv("INVENTORY_SERVICE_URL", "http://localhost:8002")
 
 
 class InventoryClient:

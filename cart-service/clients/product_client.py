@@ -6,7 +6,7 @@ from fastapi import HTTPException
 
 load_dotenv()
 
-PRODUCT_SERVICE_URL = os.getenv("PRODUCT_SERVICE_URL")
+PRODUCT_SERVICE_URL = os.getenv("PRODUCT_SERVICE_URL", "http://localhost:8000")
 
 
 class ProductClient:
@@ -17,7 +17,7 @@ class ProductClient:
         access_token: str
     ):
 
-        url = f"{PRODUCT_SERVICE_URL}/product/{product_id}"
+        url = f"{PRODUCT_SERVICE_URL}/products/{product_id}"
 
         headers = {
             "Authorization": f"Bearer {access_token}"
@@ -64,7 +64,7 @@ class ProductClient:
         update_data: dict,
         access_token: str
     ):
-        url = f"{PRODUCT_SERVICE_URL}/product/{product_id}"
+        url = f"{PRODUCT_SERVICE_URL}/products/{product_id}"
         headers = {
             "Authorization": f"Bearer {access_token}"
         }

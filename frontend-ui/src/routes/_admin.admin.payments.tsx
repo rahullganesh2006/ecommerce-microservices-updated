@@ -37,19 +37,21 @@ function AdminPayments() {
 
   const payments = useMemo(() => {
     const raw: Payment[] = response?.data || [];
-    const groups = raw.reduce((acc, p) => {
-      if (!acc[p.order_id]) {
-        acc[p.order_id] = { ...p, amount: 0 };
-      }
-      acc[p.order_id].amount += p.amount;
-      return acc;
-    }, {} as Record<string, Payment>);
-    return Object.values(groups).sort((a, b) => b.payment_id.localeCompare(a.payment_id));
+    return [...raw].sort((a, b) => {
+      // Sort by payment_time or payment_id descending
+      const timeA = a.payment_time ? new Date(a.payment_time).getTime() : 0;
+      const timeB = b.payment_time ? new Date(b.payment_time).getTime() : 0;
+      if (timeA && timeB && timeA !== timeB) return timeB - timeA;
+      return b.payment_id.localeCompare(a.payment_id);
+    });
   }, [response]);
 
-  const success = payments.filter((p) => p.payment_status === "Success" || p.payment_status === "Completed");
-  const failed = payments.filter((p) => p.payment_status === "Failed");
-  const revenue = success.reduce((n, p) => n + p.amount, 0);
+  const success = payments.filter((p) => {
+    const s = p.payment_status?.toUpperCase();
+    return s === "SUCCESS" || s === "COMPLETED";
+  });
+  const failed = payments.filter((p) => p.payment_status?.toUpperCase() === "FAILED");
+  const revenue = success.reduce((n, p) => n + Number(p.amount || 0), 0);
 
   return (
     <div>
@@ -96,8 +98,8 @@ function AdminPayments() {
                   <TableCell>₹{p.amount}</TableCell>
                   <TableCell>{formatPaymentDate(p.payment_id, p.payment_time)}</TableCell>
                   <TableCell>
-                    <Badge variant={p.payment_status === "Success" || p.payment_status === "Completed" ? "default" : p.payment_status === "Failed" ? "destructive" : "secondary"}>
-                      {p.payment_status === "Refunded" && <RefreshCcw className="mr-1 h-3 w-3" />}
+                    <Badge variant={p.payment_status?.toUpperCase() === "SUCCESS" || p.payment_status?.toUpperCase() === "COMPLETED" ? "default" : p.payment_status?.toUpperCase() === "FAILED" ? "destructive" : "secondary"}>
+                      {p.payment_status?.toUpperCase() === "REFUNDED" && <RefreshCcw className="mr-1 h-3 w-3" />}
                       {p.payment_status}
                     </Badge>
                   </TableCell>

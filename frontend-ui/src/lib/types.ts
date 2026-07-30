@@ -109,13 +109,14 @@ export interface PaymentCreate {
   payment_method: string;
 }
 
-export type PaymentMethod = "card" | "upi" | "netbanking" | "wallet";
+export type PaymentMethod = "card" | "upi" | "netbanking" | "wallet" | "cod";
 
 export const PAYMENT_METHOD_MAP: Record<PaymentMethod, string> = {
   card: "CARD",
   upi: "UPI",
   netbanking: "NET_BANKING",
   wallet: "WALLET",
+  cod: "COD",
 };
 
 export interface ApiResponse<T> {

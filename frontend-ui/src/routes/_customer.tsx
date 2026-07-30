@@ -85,7 +85,7 @@ function CustomerLayout() {
               <ShoppingCart className="h-4 w-4" />
               {cartCount > 0 && <Badge className="absolute -right-1 -top-1 h-4 min-w-4 rounded-full bg-gradient-brand px-1 text-[10px]">{cartCount}</Badge>}
             </Button>
-            <Button variant="ghost" size="icon"><Bell className="h-4 w-4" /></Button>
+
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

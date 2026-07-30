@@ -29,12 +29,20 @@ function formatOrderDate(order_id: string) {
 }
 
 function AdminAnalytics() {
-  const { data: ordersResponse, isLoading } = useQuery({
+  const { data: ordersResponse, isLoading: loadingOrders } = useQuery({
     queryKey: ["orders"],
     queryFn: () => api.orders.list(),
   });
+  
+  const { data: paymentsResponse, isLoading: loadingPayments } = useQuery({
+    queryKey: ["analytics-payments"],
+    queryFn: () => api.payments.list(),
+  });
 
   const orders = ordersResponse?.data || [];
+  const payments = paymentsResponse?.data || [];
+  
+  const isLoading = loadingOrders || loadingPayments;
 
   const analytics = useMemo(() => {
     let totalRevenue = 0;
@@ -46,20 +54,47 @@ function AdminAnalytics() {
     // Top Selling Products
     const productMap: Record<string, { name: string, qty: number, revenue: number }> = {};
     
-    // Revenue Trend by Month
-    const monthlyRev: Record<string, number> = {};
+    // Revenue Trend by Day (Last 7 Days)
+    const dailyRev: Record<string, number> = {};
+    
+    // Initialize the last 7 days to ensure a complete graph even with empty days
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dayStr = d.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+      dailyRev[dayStr] = 0;
+    }
+
+    // Calculate revenue using the Payment Service (authoritative source)
+    payments.forEach(p => {
+      const s = p.payment_status?.toUpperCase();
+      if (s === "SUCCESS" || s === "COMPLETED") {
+        totalRevenue += Number(p.amount || 0);
+        
+        let date = new Date();
+        if (p.payment_time) {
+          try {
+            const parsed = new Date(p.payment_time);
+            if (!isNaN(parsed.getTime())) date = parsed;
+          } catch(e) {}
+        } else {
+           const parts = p.payment_id.split("-");
+           if (parts.length > 1) {
+             const ts = parseInt(parts[1], 10);
+             if (!isNaN(ts)) date = new Date(ts);
+           }
+        }
+        
+        const dayStr = date.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+        if (dailyRev[dayStr] !== undefined) {
+          dailyRev[dayStr] += Number(p.amount || 0);
+        } else {
+          dailyRev[dayStr] = (dailyRev[dayStr] || 0) + Number(p.amount || 0);
+        }
+      }
+    });
 
     orders.forEach(o => {
-      // Only count non-cancelled for revenue
-      if (o.order_status !== "Cancelled") {
-        totalRevenue += o.total_amount;
-        
-        // Month grouping
-        const date = formatOrderDate(o.order_id);
-        const month = date.toLocaleString('default', { month: 'short', year: '2-digit' });
-        monthlyRev[month] = (monthlyRev[month] || 0) + o.total_amount;
-      }
-
       statusMap[o.order_status] = (statusMap[o.order_status] || 0) + 1;
 
       o.items?.forEach(i => {
@@ -81,8 +116,11 @@ function AdminAnalytics() {
       .sort((a, b) => b.qty - a.qty)
       .slice(0, 5);
 
-    // Sort months chronologically if possible, or just keep insertion order since it's dynamic
-    const revenueTrend = Object.entries(monthlyRev).map(([m, r]) => ({ m, r }));
+    // Sort days chronologically (assuming keys were inserted chronologically for the 7 days)
+    // For older dates, they will appear at the end, so we sort them properly
+    const revenueTrend = Object.keys(dailyRev)
+      .sort((a, b) => new Date(`${a} ${new Date().getFullYear()}`).getTime() - new Date(`${b} ${new Date().getFullYear()}`).getTime())
+      .map(m => ({ m, r: dailyRev[m] }));
 
     const aov = orders.length > 0 ? (totalRevenue / orders.filter(o => o.order_status !== "Cancelled").length) || 0 : 0;
 

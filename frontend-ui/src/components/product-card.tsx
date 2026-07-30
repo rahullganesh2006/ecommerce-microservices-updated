@@ -19,7 +19,7 @@ export function ProductCard({ product }: { product: Product }) {
       className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition hover:shadow-elegant">
       <Link to="/shop/products" className="block">
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-          <img src={product.image || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"} alt={product.product_name} loading="lazy"
+          <img src={product.image_url || product.image || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"} alt={product.product_name} loading="lazy"
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
           {oos && <Badge variant="destructive" className="absolute left-3 top-3">Out of stock</Badge>}
           {!oos && product.stock < 20 && <Badge className="absolute left-3 top-3 bg-warning text-warning-foreground">Low stock</Badge>}

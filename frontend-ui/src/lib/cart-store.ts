@@ -32,16 +32,24 @@ export const useCart = create<CartState>()(
         let cart_id: string | undefined = undefined;
         if (customerId) {
           try {
-            const res = await api.cart.add({ customer_id: customerId, product_id: p.product_id, quantity: qty });
-            cart_id = res.data?.cart_id;
-            // Only update local state if backend succeeds
+            // Optimistic update: Apply locally immediately
             set((s) => {
               const existing = s.items.find((i) => i.product.product_id === p.product_id);
               if (existing) {
-                return { items: s.items.map((i) => i.product.product_id === p.product_id ? { ...i, qty: i.qty + qty, cart_id: cart_id ?? i.cart_id } : i) };
+                return { items: s.items.map((i) => i.product.product_id === p.product_id ? { ...i, qty: i.qty + qty } : i) };
               }
-              return { items: [...s.items, { product: p, qty, cart_id }] };
+              return { items: [...s.items, { product: p, qty }] };
             });
+
+            const res = await api.cart.add({ customer_id: customerId, product_id: p.product_id, quantity: qty });
+            cart_id = res.data?.cart_id;
+            
+            // Update cart_id silently after backend succeeds
+            if (cart_id) {
+              set((s) => ({
+                items: s.items.map((i) => i.product.product_id === p.product_id ? { ...i, cart_id } : i)
+              }));
+            }
           } catch (e) {
             console.error("Failed to sync add to backend", e);
             throw e;
@@ -61,8 +69,9 @@ export const useCart = create<CartState>()(
         const item = get().items.find((i) => i.product.product_id === id);
         if (item && item.cart_id) {
           try {
-            await api.cart.remove(item.cart_id);
+            // Optimistic update
             set((s) => ({ items: s.items.filter((i) => i.product.product_id !== id) }));
+            await api.cart.remove(item.cart_id);
           } catch (e) {
             console.error("Failed to sync remove to backend", e);
             // Optionally throw e so the UI can show a toast
@@ -77,10 +86,11 @@ export const useCart = create<CartState>()(
         const newQty = Math.max(1, qty);
         if (item && item.cart_id) {
           try {
-            await api.cart.update(item.cart_id, { quantity: newQty });
+            // Optimistic update
             set((s) => ({
               items: s.items.map((i) => i.product.product_id === id ? { ...i, qty: newQty } : i)
             }));
+            await api.cart.update(item.cart_id, { quantity: newQty });
           } catch (e) {
             console.error("Failed to sync update to backend", e);
             throw e;

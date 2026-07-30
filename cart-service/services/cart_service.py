@@ -88,13 +88,21 @@ class CartService:
         diff = quantity - old_quantity
 
         if diff > 0:
-            inventory = InventoryClient.get_inventory(item["product_id"], access_token)
-            if diff > inventory["available_stock"]:
-                raise HTTPException(status_code=400, detail="Requested quantity exceeds available stock")
-            InventoryClient.reserve_stock(inventory["inventory_id"], diff, access_token)
+            try:
+                inventory = InventoryClient.get_inventory(item["product_id"], access_token)
+                if diff > inventory["available_stock"]:
+                    raise HTTPException(status_code=400, detail="Requested quantity exceeds available stock")
+                InventoryClient.reserve_stock(inventory["inventory_id"], diff, access_token)
+            except HTTPException as e:
+                raise e
+            except Exception as e:
+                print(f"Warning: Failed to reserve stock for {item['product_id']}: {e}")
         elif diff < 0:
-            inventory = InventoryClient.get_inventory(item["product_id"], access_token)
-            InventoryClient.release_stock(inventory["inventory_id"], abs(diff), access_token)
+            try:
+                inventory = InventoryClient.get_inventory(item["product_id"], access_token)
+                InventoryClient.release_stock(inventory["inventory_id"], abs(diff), access_token)
+            except Exception as e:
+                print(f"Warning: Failed to release stock for {item['product_id']}: {e}")
 
         updated = CartRepository.update_cart(
             cart_id,
@@ -111,8 +119,11 @@ class CartService:
     
         item = CartRepository.get_cart_item(cart_id)
         if item:
-            inventory = InventoryClient.get_inventory(item["product_id"], access_token)
-            InventoryClient.release_stock(inventory["inventory_id"], item["quantity"], access_token)
+            try:
+                inventory = InventoryClient.get_inventory(item["product_id"], access_token)
+                InventoryClient.release_stock(inventory["inventory_id"], item["quantity"], access_token)
+            except Exception as e:
+                print(f"Warning: Failed to release stock when removing cart item {cart_id}: {e}")
 
         deleted = CartRepository.remove_cart(
             cart_id
@@ -126,7 +137,23 @@ class CartService:
         }
 
     @staticmethod
-    def checkout(customer_id, payment_method, shipping_address, items, access_token):
+    def _process_checkout_cleanup(items, access_token):
+        for item in items:
+            try:
+                inventory = InventoryClient.get_inventory(item["product_id"], access_token)
+                InventoryClient.confirm_stock(inventory["inventory_id"], item["quantity"], access_token)
+                
+                prod = ProductClient.get_product(item["product_id"], access_token)
+                new_stock = max(0, prod["stock"] - item["quantity"])
+                ProductClient.update_product(item["product_id"], {"stock": new_stock}, access_token)
+            except Exception as e:
+                print(f"Failed to sync master product catalog for {item['product_id']}: {e}")
+                
+            if item.get("cart_id"):
+                CartRepository.remove_cart(item["cart_id"])
+
+    @staticmethod
+    def checkout(customer_id, payment_method, shipping_address, items, access_token, background_tasks):
 
         if not items:
             raise HTTPException(status_code=400, detail="Cart is empty")
@@ -167,20 +194,8 @@ class CartService:
         }
         PaymentClient.create_payment(payment_data, access_token)
         
-        # 3. Process inventory and cleanup loop
-        for item in items:
-            inventory = InventoryClient.get_inventory(item["product_id"], access_token)
-            InventoryClient.confirm_stock(inventory["inventory_id"], item["quantity"], access_token)
-            
-            try:
-                prod = ProductClient.get_product(item["product_id"], access_token)
-                new_stock = max(0, prod["stock"] - item["quantity"])
-                ProductClient.update_product(item["product_id"], {"stock": new_stock}, access_token)
-            except Exception as e:
-                print(f"Failed to sync master product catalog for {item['product_id']}: {e}")
-                
-            if item.get("cart_id"):
-                CartRepository.remove_cart(item["cart_id"])
+        # 3. Process inventory and cleanup asynchronously
+        background_tasks.add_task(CartService._process_checkout_cleanup, items, access_token)
 
         return {
             "message": "Checkout successful, items purchased.",

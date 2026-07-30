@@ -103,3 +103,5 @@ site-packages/
 # Temporary files
 response.json
 scratch/
+
+terraform/terraform.tfvars

@@ -39,31 +39,37 @@ function CartPage() {
         <h1 className="mb-6 text-2xl font-semibold tracking-tight">Shopping cart</h1>
         <div className="space-y-3">
           <AnimatePresence>
-            {items.map((i) => (
-              <motion.div key={i.product.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -20 }}>
+            {items.map((i) => {
+              const pId = i.product.product_id || (i.product as any).id;
+              const pName = i.product.product_name || (i.product as any).name;
+              const pImage = i.product.image_url || (i.product as any).image;
+              const pPrice = i.product.price;
+              
+              return (
+              <motion.div key={pId} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <Card className="shadow-soft">
                   <CardContent className="flex gap-4 p-4">
-                    <img src={i.product.image} alt={i.product.name} className="h-24 w-24 rounded-lg object-cover" />
+                    <img src={pImage} alt={pName} className="h-24 w-24 rounded-lg object-cover" />
                     <div className="flex-1">
-                      <div className="text-xs text-muted-foreground">{i.product.category}</div>
-                      <div className="font-medium">{i.product.name}</div>
-                      <div className="mt-1 text-sm font-semibold">₹{i.product.price}</div>
+                      <div className="text-xs text-muted-foreground">Product</div>
+                      <div className="font-medium">{pName}</div>
+                      <div className="mt-1 text-sm font-semibold">₹{pPrice}</div>
                       <div className="mt-3 flex items-center gap-2">
                         <div className="flex items-center rounded-lg border border-border">
-                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setQty(i.product.id, i.qty - 1)}><Minus className="h-3 w-3" /></Button>
+                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setQty(pId, i.qty - 1)}><Minus className="h-3 w-3" /></Button>
                           <div className="w-8 text-center text-sm">{i.qty}</div>
-                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setQty(i.product.id, i.qty + 1)}><Plus className="h-3 w-3" /></Button>
+                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setQty(pId, i.qty + 1)}><Plus className="h-3 w-3" /></Button>
                         </div>
-                        <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={() => remove(i.product.id)}>
+                        <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={() => remove(pId)}>
                           <Trash2 className="mr-1 h-3.5 w-3.5" /> Remove
                         </Button>
                       </div>
                     </div>
-                    <div className="text-right font-semibold">₹{(i.product.price * i.qty).toFixed(2)}</div>
+                    <div className="text-right font-semibold">₹{(pPrice * i.qty).toFixed(2)}</div>
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            )})}
           </AnimatePresence>
         </div>
       </div>
