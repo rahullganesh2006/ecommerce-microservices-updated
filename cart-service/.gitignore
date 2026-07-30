@@ -1,0 +1,28 @@
+# Virtual Environment
+venv/
+.venv/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Environment Variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Test Cache
+.pytest_cache/
+
+# Distribution
+build/
+dist/
+
+# Lambda
+*.zip
+
+# OS Files
+.DS_Store
+Thumbs.db

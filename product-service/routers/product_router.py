@@ -1,14 +1,20 @@
 from fastapi import APIRouter
 from fastapi import HTTPException
 from fastapi import status
+from fastapi import Depends
 
 from schemas.product_schema import ProductCreate
 from schemas.product_schema import ProductUpdate
+
 from services.product_service import ProductService
+
+from security import get_current_user
+
 
 router = APIRouter(
     prefix="/products",
-    tags=["Product Service"]
+    tags=["Product Service"],
+    dependencies=[Depends(get_current_user)]
 )
 
 

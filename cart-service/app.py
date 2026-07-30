@@ -1,28 +1,25 @@
 from fastapi import FastAPI
 from mangum import Mangum
 
-from routers.cart_router import router
+from routers.cart_router import router as cart_router
 
 app = FastAPI(
     title="Cart Service",
+    description="E-Commerce Cart Microservice",
     version="1.0.0"
 )
 
-
 @app.get("/")
-def home():
+def health_check():
     return {
-        "message": "Cart Service Running Successfully"
+        "status": "success",
+        "message": "Cart Service is running"
     }
 
+app.include_router(
+    cart_router,
+    prefix="/cart",
+    tags=["Cart"]
+)
 
-@app.get("/health")
-def health():
-    return {
-        "status": "Healthy"
-    }
-
-
-app.include_router(router)
-
-handler = Mangum(app, lifespan="off")
+handler = Mangum(app)

@@ -1,83 +1,150 @@
 from fastapi.testclient import TestClient
+from unittest.mock import patch
 
 from app import app
 
 client = TestClient(app)
 
 
-def test_home():
-
-    response = client.get("/")
-
-    assert response.status_code == 200
-    assert response.json() == {
-        "message": "Cart Service Running Successfully"
+def mock_user():
+    return {
+        "access_token": "dummy-token",
+        "claims": {
+            "sub": "12345"
+        }
     }
 
 
-def test_health():
+@patch("security.get_current_user", return_value=mock_user())
+@patch("services.cart_service.ProductClient.get_product")
+@patch("services.cart_service.InventoryClient.get_inventory")
+@patch("services.cart_service.CartRepository.add_to_cart")
+def test_add_to_cart(
+    mock_add,
+    mock_inventory,
+    mock_product,
+    mock_auth
+):
 
-    response = client.get("/health")
-
-    assert response.status_code == 200
-    assert response.json() == {
-        "status": "Healthy"
+    mock_product.return_value = {
+        "product_id": "P100",
+        "product_name": "iPhone 16",
+        "price": 80000
     }
 
+    mock_inventory.return_value = {
+        "product_id": "P100",
+        "available_quantity": 50
+    }
 
-def test_get_all_cart():
-
-    response = client.get("/cart/")
-
-    assert response.status_code == 200
-
-
-def test_create_cart():
-
-    payload = {
-        "cart_id": "C101",
-        "customer_id": "CUS101",
-        "product_id": "P101",
+    mock_add.return_value = {
+        "cart_id": "CART001",
+        "customer_id": "CUS1001",
+        "product_id": "P100",
+        "product_name": "iPhone 16",
         "quantity": 2,
-        "price": 1500
+        "unit_price": 80000,
+        "total_price": 160000
     }
 
     response = client.post(
-        "/cart/",
-        json=payload
+        "/cart/add",
+        headers={
+            "Authorization": "Bearer dummy-token"
+        },
+        json={
+            "customer_id": "CUS1001",
+            "product_id": "P100",
+            "quantity": 2
+        }
     )
 
-    assert response.status_code in [201, 409]
+    assert response.status_code == 201
 
 
-def test_get_cart():
+@patch("security.get_current_user", return_value=mock_user())
+@patch("services.cart_service.CartRepository.get_cart_by_customer")
+def test_get_cart(
+    mock_cart,
+    mock_auth
+):
+
+    mock_cart.return_value = []
 
     response = client.get(
-        "/cart/C101"
+        "/cart/customer/CUS1001",
+        headers={
+            "Authorization": "Bearer dummy-token"
+        }
     )
 
-    assert response.status_code in [200, 404]
+    assert response.status_code == 200
 
 
-def test_update_cart():
+@patch("security.get_current_user", return_value=mock_user())
+@patch("services.cart_service.CartRepository.update_cart")
+def test_update_cart(
+    mock_update,
+    mock_auth
+):
 
-    payload = {
-        "quantity": 5,
-        "price": 1800
+    mock_update.return_value = {
+        "cart_id": "CART001",
+        "quantity": 5
     }
 
     response = client.put(
-        "/cart/C101",
-        json=payload
+        "/cart/update/CART001",
+        headers={
+            "Authorization": "Bearer dummy-token"
+        },
+        json={
+            "quantity": 5
+        }
     )
 
-    assert response.status_code in [200, 404]
+    assert response.status_code == 200
 
 
-def test_delete_cart():
+@patch("security.get_current_user", return_value=mock_user())
+@patch("services.cart_service.CartRepository.remove_cart")
+def test_remove_cart(
+    mock_remove,
+    mock_auth
+):
+
+    mock_remove.return_value = True
 
     response = client.delete(
-        "/cart/C101"
+        "/cart/remove/CART001",
+        headers={
+            "Authorization": "Bearer dummy-token"
+        }
     )
 
-    assert response.status_code in [200, 404]
+    assert response.status_code == 200
+
+
+@patch("security.get_current_user", return_value=mock_user())
+@patch("services.cart_service.CartRepository.checkout")
+def test_checkout(
+    mock_checkout,
+    mock_auth
+):
+
+    mock_checkout.return_value = {
+        "customer_id": "CUS1001",
+        "subtotal": 1000,
+        "gst": 180,
+        "shipping_charge": 100,
+        "grand_total": 1280
+    }
+
+    response = client.get(
+        "/cart/checkout/CUS1001",
+        headers={
+            "Authorization": "Bearer dummy-token"
+        }
+    )
+
+    assert response.status_code == 200

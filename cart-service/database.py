@@ -1,16 +1,18 @@
 import os
+
 import boto3
 
-if os.getenv("AWS_LAMBDA_FUNCTION_NAME") is None:
-    from dotenv import load_dotenv
-    load_dotenv(override=False)
+from dotenv import load_dotenv
 
-TABLE_NAME = os.getenv("TABLE_NAME")
-AWS_REGION = os.getenv("APP_REGION")
+load_dotenv()
+
+AWS_REGION = os.getenv("AWS_REGION")
+
+TABLE_NAME = os.getenv("DYNAMODB_TABLE")
 
 dynamodb = boto3.resource(
     "dynamodb",
     region_name=AWS_REGION
 )
 
-table = dynamodb.Table(TABLE_NAME)
+cart_table = dynamodb.Table(TABLE_NAME)

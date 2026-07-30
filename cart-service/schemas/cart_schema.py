@@ -1,37 +1,42 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel
+from typing import List
 
 
-class CartCreate(BaseModel):
+class AddToCartRequest(BaseModel):
 
-    cart_id: str = Field(..., example="C101")
-
-    customer_id: str = Field(..., example="CUS101")
-
-    product_id: str = Field(..., example="P101")
-
-    quantity: int = Field(..., ge=1)
-
-    price: float = Field(..., gt=0)
+    customer_id: str
+    product_id: str
+    quantity: int
 
 
-class CartUpdate(BaseModel):
+class UpdateCartRequest(BaseModel):
 
-    quantity: Optional[int] = Field(default=None, ge=1)
+    quantity: int
 
-    price: Optional[float] = Field(default=None, gt=0)
+
+class CartItemResponse(BaseModel):
+
+    cart_id: str
+    customer_id: str
+    product_id: str
+    product_name: str
+    quantity: int
+    unit_price: float
+    total_price: float
 
 
 class CartResponse(BaseModel):
 
-    cart_id: str
+    customer_id: str
+    items: List[CartItemResponse]
+    total_items: int
+    cart_total: float
+
+
+class CheckoutResponse(BaseModel):
 
     customer_id: str
-
-    product_id: str
-
-    quantity: int
-
-    price: float
-
-    total_price: float
+    subtotal: float
+    gst: float
+    shipping_charge: float
+    grand_total: float

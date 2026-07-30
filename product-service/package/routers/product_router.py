@@ -1,10 +1,19 @@
 from fastapi import APIRouter
 from fastapi import HTTPException
 from fastapi import status
+from fastapi import Depends
+
+from fastapi.security import HTTPBearer
+from fastapi.security import HTTPAuthorizationCredentials
 
 from schemas.product_schema import ProductCreate
 from schemas.product_schema import ProductUpdate
 from services.product_service import ProductService
+
+
+# Swagger JWT Security
+security = HTTPBearer()
+
 
 router = APIRouter(
     prefix="/products",
@@ -16,7 +25,10 @@ router = APIRouter(
     "/",
     status_code=status.HTTP_201_CREATED
 )
-def create_product(product: ProductCreate):
+def create_product(
+    product: ProductCreate,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
 
     created_product = ProductService.create_product(product)
 
@@ -33,7 +45,9 @@ def create_product(product: ProductCreate):
 
 
 @router.get("/")
-def get_all_products():
+def get_all_products(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
 
     products = ProductService.get_all_products()
 
@@ -44,7 +58,10 @@ def get_all_products():
 
 
 @router.get("/{product_id}")
-def get_product(product_id: str):
+def get_product(
+    product_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
 
     product = ProductService.get_product_by_id(product_id)
 
@@ -60,7 +77,8 @@ def get_product(product_id: str):
 @router.put("/{product_id}")
 def update_product(
     product_id: str,
-    product: ProductUpdate
+    product: ProductUpdate,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
 
     updated_product = ProductService.update_product(
@@ -81,7 +99,10 @@ def update_product(
 
 
 @router.delete("/{product_id}")
-def delete_product(product_id: str):
+def delete_product(
+    product_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
 
     deleted = ProductService.delete_product(product_id)
 

@@ -1,146 +1,150 @@
 from decimal import Decimal
-from botocore.exceptions import ClientError
 
-from database import table
+from boto3.dynamodb.conditions import Attr
+
+from database import cart_table
 
 
 class CartRepository:
 
     @staticmethod
-    def create_cart(cart):
+    def add_to_cart(item: dict):
 
-        try:
-
-            response = table.get_item(
-                Key={
-                    "cart_id": cart.cart_id
-                }
-            )
-
-            if "Item" in response:
-                return None
-
-            total = cart.quantity * cart.price
-
-            item = {
-
-                "cart_id": cart.cart_id,
-
-                "customer_id": cart.customer_id,
-
-                "product_id": cart.product_id,
-
-                "quantity": cart.quantity,
-
-                "price": Decimal(str(cart.price)),
-
-                "total_price": Decimal(str(total))
-
+        existing = cart_table.get_item(
+            Key={
+                "cart_id": item["cart_id"]
             }
+        )
 
-            table.put_item(Item=item)
+        if "Item" in existing:
+            return None
 
-            return item
+        dynamo_item = {}
 
-        except ClientError as e:
+        for key, value in item.items():
 
-            raise Exception(e.response["Error"]["Message"])
+            if isinstance(value, float):
+                dynamo_item[key] = Decimal(str(value))
+            else:
+                dynamo_item[key] = value
 
-    @staticmethod
-    def get_all_cart():
+        cart_table.put_item(
+            Item=dynamo_item
+        )
 
-        try:
-
-            response = table.scan()
-
-            return response.get("Items", [])
-
-        except ClientError as e:
-
-            raise Exception(e.response["Error"]["Message"])
+        return item
 
     @staticmethod
-    def get_cart_by_id(cart_id):
+    def get_cart_by_customer(customer_id: str):
 
-        try:
+        response = cart_table.scan(
+            FilterExpression=Attr("customer_id").eq(customer_id)
+        )
 
-            response = table.get_item(
-                Key={
-                    "cart_id": cart_id
-                }
-            )
+        items = response.get("Items", [])
 
-            return response.get("Item")
+        result = []
 
-        except ClientError as e:
+        for item in items:
 
-            raise Exception(e.response["Error"]["Message"])
+            converted = {}
 
-    @staticmethod
-    def update_cart(cart_id, cart):
+            for key, value in item.items():
 
-        try:
+                if isinstance(value, Decimal):
+                    converted[key] = float(value)
+                else:
+                    converted[key] = value
 
-            response = table.get_item(
-                Key={
-                    "cart_id": cart_id
-                }
-            )
+            result.append(converted)
 
-            if "Item" not in response:
-                return None
-
-            item = response["Item"]
-
-            update_data = cart.model_dump(exclude_unset=True)
-
-            if "price" in update_data:
-                update_data["price"] = Decimal(
-                    str(update_data["price"])
-                )
-
-            if "quantity" in update_data:
-
-                price = float(item["price"])
-
-                quantity = update_data["quantity"]
-
-                update_data["total_price"] = Decimal(
-                    str(price * quantity)
-                )
-
-            item.update(update_data)
-
-            table.put_item(Item=item)
-
-            return item
-
-        except ClientError as e:
-
-            raise Exception(e.response["Error"]["Message"])
+        return result
 
     @staticmethod
-    def delete_cart(cart_id):
+    def get_cart_item(cart_id: str):
 
-        try:
+        response = cart_table.get_item(
+            Key={
+                "cart_id": cart_id
+            }
+        )
 
-            response = table.get_item(
-                Key={
-                    "cart_id": cart_id
-                }
-            )
+        item = response.get("Item")
 
-            if "Item" not in response:
-                return False
+        if item is None:
+            return None
 
-            table.delete_item(
-                Key={
-                    "cart_id": cart_id
-                }
-            )
+        converted = {}
 
-            return True
+        for key, value in item.items():
 
-        except ClientError as e:
+            if isinstance(value, Decimal):
+                converted[key] = float(value)
+            else:
+                converted[key] = value
 
-            raise Exception(e.response["Error"]["Message"])
+        return converted
+
+    @staticmethod
+    def update_cart(cart_id: str, quantity: int):
+
+        item = CartRepository.get_cart_item(cart_id)
+
+        if item is None:
+            return None
+
+        item["quantity"] = quantity
+        item["total_price"] = item["unit_price"] * quantity
+
+        dynamo_item = {}
+
+        for key, value in item.items():
+
+            if isinstance(value, float):
+                dynamo_item[key] = Decimal(str(value))
+            else:
+                dynamo_item[key] = value
+
+        cart_table.put_item(
+            Item=dynamo_item
+        )
+
+        return item
+
+    @staticmethod
+    def remove_cart(cart_id: str):
+
+        item = CartRepository.get_cart_item(cart_id)
+
+        if item is None:
+            return False
+
+        cart_table.delete_item(
+            Key={
+                "cart_id": cart_id
+            }
+        )
+
+        return True
+
+    @staticmethod
+    def checkout(customer_id: str):
+
+        items = CartRepository.get_cart_by_customer(customer_id)
+
+        subtotal = 0
+
+        for item in items:
+            subtotal += item["total_price"]
+
+        gst = subtotal * 0.18
+        shipping_charge = 100 if subtotal > 0 else 0
+        grand_total = subtotal + gst + shipping_charge
+
+        return {
+            "customer_id": customer_id,
+            "subtotal": subtotal,
+            "gst": gst,
+            "shipping_charge": shipping_charge,
+            "grand_total": grand_total
+        }

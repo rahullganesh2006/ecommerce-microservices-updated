@@ -75,6 +75,9 @@ class ProductRepository:
 
             update_data = product.model_dump(exclude_unset=True)
 
+            if "price" in update_data:
+                update_data["price"] = Decimal(str(update_data["price"]))
+
             item.update(update_data)
 
             table.put_item(Item=item)

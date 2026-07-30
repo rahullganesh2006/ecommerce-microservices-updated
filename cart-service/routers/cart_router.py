@@ -1,98 +1,94 @@
 from fastapi import APIRouter
+from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import status
 
-from schemas.cart_schema import CartCreate
-from schemas.cart_schema import CartUpdate
+from security import get_current_user
+
+from schemas.cart_schema import AddToCartRequest
+from schemas.cart_schema import UpdateCartRequest
+
 from services.cart_service import CartService
 
-router = APIRouter(
-    prefix="/cart",
-    tags=["Cart Service"]
-)
+router = APIRouter()
 
 
 @router.post(
-    "/",
+    "/add",
     status_code=status.HTTP_201_CREATED
 )
-def create_cart(cart: CartCreate):
+def add_to_cart(
+    cart: AddToCartRequest,
+    user=Depends(get_current_user)
+):
 
-    created = CartService.create_cart(cart)
+    created = CartService.create_cart(
+        cart,
+        user["access_token"]
+    )
 
     if created is None:
+
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Cart already exists"
+            status_code=409,
+            detail="Cart item already exists"
         )
 
     return {
-        "message": "Cart created successfully",
+        "message": "Item added to cart successfully",
         "data": created
     }
 
 
-@router.get("/")
-def get_all_cart():
-
-    carts = CartService.get_all_cart()
-
-    return {
-        "count": len(carts),
-        "data": carts
-    }
-
-
-@router.get("/{cart_id}")
-def get_cart(cart_id: str):
-
-    cart = CartService.get_cart_by_id(cart_id)
-
-    if cart is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Cart not found"
-        )
-
-    return cart
-
-
-@router.put("/{cart_id}")
-def update_cart(
-    cart_id: str,
-    cart: CartUpdate
+@router.get(
+    "/customer/{customer_id}"
+)
+def get_customer_cart(
+    customer_id: str,
+    user=Depends(get_current_user)
 ):
 
-    updated = CartService.update_cart(
-        cart_id,
-        cart
+    return CartService.get_customer_cart(
+        customer_id
     )
 
-    if updated is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Cart not found"
-        )
 
-    return {
-        "message": "Cart updated successfully",
-        "data": updated
-    }
+@router.put(
+    "/update/{cart_id}"
+)
+def update_cart(
+    cart_id: str,
+    request: UpdateCartRequest,
+    user=Depends(get_current_user)
+):
+
+    return CartService.update_cart(
+        cart_id,
+        request.quantity
+    )
 
 
-@router.delete("/{cart_id}")
-def delete_cart(cart_id: str):
+@router.delete(
+    "/remove/{cart_id}"
+)
+def remove_cart(
+    cart_id: str,
+    user=Depends(get_current_user)
+):
 
-    deleted = CartService.delete_cart(
+    return CartService.remove_cart(
         cart_id
     )
 
-    if not deleted:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Cart not found"
-        )
 
-    return {
-        "message": "Cart deleted successfully"
-    }
+@router.get(
+    "/checkout/{customer_id}"
+)
+def checkout(
+    customer_id: str,
+    user=Depends(get_current_user)
+):
+
+    return CartService.checkout(
+        customer_id
+    )

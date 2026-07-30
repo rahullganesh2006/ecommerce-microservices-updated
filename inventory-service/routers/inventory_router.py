@@ -1,10 +1,17 @@
 from fastapi import APIRouter
 from fastapi import HTTPException
 from fastapi import status
+from fastapi import Depends
+
+from fastapi.security import HTTPBearer
+from fastapi.security import HTTPAuthorizationCredentials
 
 from schemas.inventory_schema import InventoryCreate
 from schemas.inventory_schema import InventoryUpdate
 from services.inventory_service import InventoryService
+
+# JWT Security for Swagger
+security = HTTPBearer()
 
 router = APIRouter(
     prefix="/inventory",
@@ -16,7 +23,10 @@ router = APIRouter(
     "/",
     status_code=status.HTTP_201_CREATED
 )
-def create_inventory(inventory: InventoryCreate):
+def create_inventory(
+    inventory: InventoryCreate,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
 
     created_inventory = InventoryService.create_inventory(inventory)
 
@@ -33,7 +43,9 @@ def create_inventory(inventory: InventoryCreate):
 
 
 @router.get("/")
-def get_all_inventory():
+def get_all_inventory(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
 
     inventory = InventoryService.get_all_inventory()
 
@@ -44,7 +56,10 @@ def get_all_inventory():
 
 
 @router.get("/{inventory_id}")
-def get_inventory(inventory_id: str):
+def get_inventory(
+    inventory_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
 
     inventory = InventoryService.get_inventory_by_id(inventory_id)
 
@@ -60,7 +75,8 @@ def get_inventory(inventory_id: str):
 @router.put("/{inventory_id}")
 def update_inventory(
     inventory_id: str,
-    inventory: InventoryUpdate
+    inventory: InventoryUpdate,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
 
     updated_inventory = InventoryService.update_inventory(
@@ -81,7 +97,10 @@ def update_inventory(
 
 
 @router.delete("/{inventory_id}")
-def delete_inventory(inventory_id: str):
+def delete_inventory(
+    inventory_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
 
     deleted = InventoryService.delete_inventory(
         inventory_id
@@ -95,4 +114,62 @@ def delete_inventory(inventory_id: str):
 
     return {
         "message": "Inventory deleted successfully"
+    }
+
+
+# -------------------------------
+# UNIQUE FEATURE 1
+# Reserve Stock
+# -------------------------------
+
+@router.post("/{inventory_id}/reserve")
+def reserve_stock(
+    inventory_id: str,
+    quantity: int,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+
+    reserved = InventoryService.reserve_stock(
+        inventory_id,
+        quantity
+    )
+
+    if reserved is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Insufficient stock"
+        )
+
+    return {
+        "message": "Stock reserved successfully",
+        "data": reserved
+    }
+
+
+# -------------------------------
+# UNIQUE FEATURE 2
+# Release Stock
+# -------------------------------
+
+@router.post("/{inventory_id}/release")
+def release_stock(
+    inventory_id: str,
+    quantity: int,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+
+    released = InventoryService.release_stock(
+        inventory_id,
+        quantity
+    )
+
+    if released is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Inventory not found"
+        )
+
+    return {
+        "message": "Reserved stock released",
+        "data": released
     }
