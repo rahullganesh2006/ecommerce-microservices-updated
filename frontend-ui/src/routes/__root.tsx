@@ -22,7 +22,7 @@ function NotFoundComponent() {
         </div>
         <h2 className="text-2xl font-semibold tracking-tight text-foreground">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          This route doesn't exist in the CloudCart platform.
+          This route doesn't exist in the Angadi Hub platform.
         </p>
         <div className="mt-6">
           <Link
@@ -75,17 +75,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "CloudCart Commerce — Enterprise Serverless E-Commerce" },
+      { title: "Angadi Hub Commerce — Enterprise Serverless E-Commerce" },
       { name: "description", content: "Enterprise serverless e-commerce platform powered by AWS microservices, Cognito auth, and role-based dashboards." },
-      { name: "author", content: "CloudCart" },
-      { property: "og:title", content: "CloudCart Commerce Platform" },
+      { name: "author", content: "Angadi Hub" },
+      { property: "og:title", content: "Angadi Hub Commerce Platform" },
       { property: "og:description", content: "Enterprise Serverless E-Commerce powered by AWS Microservices." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/logo.jpg", type: "image/jpeg" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" },

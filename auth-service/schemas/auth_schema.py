@@ -11,3 +11,8 @@ class PasswordLoginRequest(BaseModel):
 
 class GoogleLoginRequest(BaseModel):
     token: str
+
+class ChangePasswordRequest(BaseModel):
+    email: str
+    current_password: str
+    new_password: str

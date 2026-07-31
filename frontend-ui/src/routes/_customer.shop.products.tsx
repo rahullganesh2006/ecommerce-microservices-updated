@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { ProductCard } from "@/components/product-card";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,11 @@ export const Route = createFileRoute("/_customer/shop/products")({
 });
 
 function ProductsPage() {
+  const search = useSearch({ strict: false }) as any;
+  const initialCategory = search?.category || "all";
+
   const [q, setQ] = useState("");
-  const [cat, setCat] = useState("all");
+  const [cat, setCat] = useState(initialCategory);
   const [sort, setSort] = useState("featured");
   
   const { data: response, isLoading } = useQuery({
@@ -22,7 +25,8 @@ function ProductsPage() {
   });
 
   const products = response?.data || [];
-  const categories = ["all", ...Array.from(new Set(products.map((p) => p.category)))];
+  const uniqueCategories = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
+  const categories = ["all", ...uniqueCategories];
 
   const filtered = useMemo(() => {
     let list = products.filter((p) => p.product_name.toLowerCase().includes(q.toLowerCase()));
@@ -66,7 +70,7 @@ function ProductsPage() {
       ) : filtered.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">No products found</div>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6">
           {filtered.map((p) => <ProductCard key={p.product_id} product={p} />)}
         </div>
       )}

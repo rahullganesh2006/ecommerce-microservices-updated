@@ -3,7 +3,7 @@ import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } 
 import { useAuth } from "@/lib/auth-store";
 import {
   LayoutDashboard, Package, Warehouse, ShoppingBag, CreditCard, Users, BarChart3,
-  FileText, Bell, Settings, Cloud, LogOut, Search, Menu,
+  FileText, Bell, Settings, Cloud, LogOut, Search, Menu, Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,11 +40,11 @@ function SidebarInner({ pathname, onNavigate }: { pathname: string; onNavigate?:
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 px-6 py-5 border-b border-sidebar-border">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-brand shadow-glow">
-          <Cloud className="h-5 w-5 text-primary-foreground" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-brand shadow-glow overflow-hidden">
+          <img src="/logo.jpg" alt="Angadi Hub Logo" className="w-full h-full object-cover" />
         </div>
         <div>
-          <div className="text-sm font-semibold tracking-tight">CloudCart</div>
+          <div className="text-sm font-semibold tracking-tight">Angadi Hub</div>
           <div className="text-[10px] uppercase tracking-wider text-sidebar-foreground/60">Admin Console</div>
         </div>
       </div>
@@ -66,16 +66,6 @@ function SidebarInner({ pathname, onNavigate }: { pathname: string; onNavigate?:
           );
         })}
       </nav>
-      <div className="border-t border-sidebar-border p-3">
-        <div className="rounded-lg bg-sidebar-accent/50 p-3 text-xs">
-          <div className="font-medium">ap-southeast-1</div>
-          <div className="mt-0.5 text-sidebar-foreground/60">All microservices operational</div>
-          <div className="mt-2 flex items-center gap-1.5 text-[10px] text-emerald-400">
-            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-            Live
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
@@ -126,12 +116,18 @@ function AdminLayout() {
                 <SidebarInner pathname={pathname} onNavigate={() => setMobileOpen(false)} />
               </SheetContent>
             </Sheet>
-            <div className="relative hidden max-w-md flex-1 sm:block">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search orders, products, customers…" className="pl-9 bg-muted/50 border-transparent focus-visible:bg-background" />
+            <div className="hidden flex-1 items-center gap-2 text-sm sm:flex ml-2">
+              <span className="text-muted-foreground">Admin Console</span>
+              <span className="text-muted-foreground/50">/</span>
+              <span className="font-medium text-foreground capitalize">
+                {pathname.split("/").filter(Boolean).pop()?.replace("-", " ") || "Dashboard"}
+              </span>
             </div>
-            <div className="ml-auto flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="relative" onClick={() => nav({ to: "/admin/notifications" })}>
+            
+            <div className="ml-auto flex items-center gap-3">
+
+
+              <Button variant="ghost" size="icon" className="relative h-9 w-9" onClick={() => nav({ to: "/admin/notifications" })}>
                 <Bell className="h-4 w-4" />
                 <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-primary" />
               </Button>

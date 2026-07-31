@@ -158,7 +158,7 @@ function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Real-time overview of CloudCart operations</p>
+        <p className="text-sm text-muted-foreground">Real-time overview of Angadi Hub operations</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

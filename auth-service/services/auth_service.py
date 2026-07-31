@@ -45,6 +45,19 @@ class AuthService:
         return AuthService._generate_auth_response(email)
 
     @staticmethod
+    def change_password(email: str, current_password: str, new_password: str):
+        email = email.lower()
+        if email not in USER_STORE:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        user = USER_STORE[email]
+        if user.get("password") != current_password:
+            raise HTTPException(status_code=401, detail="Incorrect current password")
+            
+        user["password"] = new_password
+        return {"message": "Password updated successfully"}
+
+    @staticmethod
     def login_with_google(token: str):
         try:
             unverified = jwt.decode(token, options={"verify_signature": False})

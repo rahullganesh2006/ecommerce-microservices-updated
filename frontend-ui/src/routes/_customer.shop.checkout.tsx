@@ -12,6 +12,7 @@ import { CreditCard, Wallet, Banknote, Smartphone, CheckCircle2, Loader2, Truck,
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-store";
 import { PAYMENT_METHOD_MAP, type PaymentMethod } from "@/lib/types";
+import { useBilling } from "@/lib/billing-store";
 
 export const Route = createFileRoute("/_customer/shop/checkout")({
   component: CheckoutPage,
@@ -68,9 +69,11 @@ function CheckoutPage() {
     
     setProcessing(true);
     try {
+      const backendPaymentMethod = PAYMENT_METHOD_MAP[method as PaymentMethod] || "CARD";
+      const fullAddress = user?.address ? `${user.address}, ${user.city}, ${user.zip}` : "221 Baker Street, Apt 4B, Chennai, 600001";
       await api.cart.checkout(user.email, {
-        payment_method: PAYMENT_METHOD_MAP[method],
-        shipping_address: "221 Baker Street, Apt 4B, San Francisco, 94103",
+        payment_method: backendPaymentMethod,
+        shipping_address: fullAddress,
         items: items.map(i => ({
           product_id: i.product.product_id || (i.product as any).id,
           product_name: i.product.product_name || (i.product as any).name,
@@ -92,13 +95,25 @@ function CheckoutPage() {
     }
   }
 
-  const methods = [
-    { id: "card" as PaymentMethod, i: CreditCard, l: "Credit / Debit card", d: "Pay securely with your card" },
-    { id: "upi" as PaymentMethod, i: Smartphone, l: "UPI", d: "Google Pay, PhonePe, Paytm" },
-    { id: "netbanking" as PaymentMethod, i: Banknote, l: "Net banking", d: "All major banks supported" },
-    { id: "wallet" as PaymentMethod, i: Wallet, l: "Wallet", d: "Amazon Pay, Mobikwik" },
-    { id: "cod" as PaymentMethod, i: PackageOpen, l: "Cash on Delivery", d: "Pay when you receive the package" },
+  const { paymentMethods } = useBilling();
+  
+  const savedMethods = paymentMethods.map(pm => ({
+    id: pm.id,
+    i: CreditCard,
+    l: `${pm.type} ending in ${pm.last4}`,
+    d: `Expires ${pm.expiry}`,
+    isSaved: true,
+  }));
+
+  const defaultMethods = [
+    { id: "card", i: CreditCard, l: "Credit / Debit card", d: "Pay securely with your card", isSaved: false },
+    { id: "upi", i: Smartphone, l: "UPI", d: "Google Pay, PhonePe, Paytm", isSaved: false },
+    { id: "netbanking", i: Banknote, l: "Net banking", d: "All major banks supported", isSaved: false },
+    { id: "wallet", i: Wallet, l: "Wallet", d: "Amazon Pay, Mobikwik", isSaved: false },
+    { id: "cod", i: PackageOpen, l: "Cash on Delivery", d: "Pay when you receive the package", isSaved: false },
   ];
+  
+  const methods = [...savedMethods, ...defaultMethods];
 
   return (
     <AnimatePresence mode="wait">
@@ -144,10 +159,10 @@ function CheckoutPage() {
               <CardContent className="p-6">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-1.5"><Label className="text-xs text-muted-foreground uppercase tracking-wider">Full Name</Label><Input className="bg-muted/30 focus-visible:bg-background" defaultValue={user?.name ?? "Customer"} /></div>
-                  <div className="space-y-1.5"><Label className="text-xs text-muted-foreground uppercase tracking-wider">Phone</Label><Input className="bg-muted/30 focus-visible:bg-background" defaultValue="+1 415 555 0132" /></div>
-                  <div className="space-y-1.5 sm:col-span-2"><Label className="text-xs text-muted-foreground uppercase tracking-wider">Address Line</Label><Input className="bg-muted/30 focus-visible:bg-background" defaultValue="221 Baker Street, Apt 4B" /></div>
-                  <div className="space-y-1.5"><Label className="text-xs text-muted-foreground uppercase tracking-wider">City</Label><Input className="bg-muted/30 focus-visible:bg-background" defaultValue="San Francisco" /></div>
-                  <div className="space-y-1.5"><Label className="text-xs text-muted-foreground uppercase tracking-wider">ZIP Code</Label><Input className="bg-muted/30 focus-visible:bg-background" defaultValue="94103" /></div>
+                  <div className="space-y-1.5"><Label className="text-xs text-muted-foreground uppercase tracking-wider">Phone</Label><Input className="bg-muted/30 focus-visible:bg-background" defaultValue={user?.phone || "+91 9876543210"} /></div>
+                  <div className="space-y-1.5 sm:col-span-2"><Label className="text-xs text-muted-foreground uppercase tracking-wider">Address Line</Label><Input className="bg-muted/30 focus-visible:bg-background" defaultValue={user?.address || "221 Baker Street, Apt 4B"} /></div>
+                  <div className="space-y-1.5"><Label className="text-xs text-muted-foreground uppercase tracking-wider">City</Label><Input className="bg-muted/30 focus-visible:bg-background" defaultValue={user?.city || "Chennai"} /></div>
+                  <div className="space-y-1.5"><Label className="text-xs text-muted-foreground uppercase tracking-wider">ZIP Code</Label><Input className="bg-muted/30 focus-visible:bg-background" defaultValue={user?.zip || "600001"} /></div>
                 </div>
               </CardContent>
             </Card>

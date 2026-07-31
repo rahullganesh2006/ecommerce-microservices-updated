@@ -9,6 +9,11 @@ export interface AuthUser {
   name: string;
   role: Role;
   avatar?: string;
+  phone?: string;
+  country?: string;
+  address?: string;
+  city?: string;
+  zip?: string;
 }
 
 export interface AuthTokens {
@@ -33,6 +38,8 @@ interface AuthState {
     tokens: AuthTokens
   ) => void;
 
+  updateUser: (data: Partial<AuthUser>) => void;
+
   logout: () => void;
 
   refresh: () => Promise<void>;
@@ -54,6 +61,12 @@ export const useAuth = create<AuthState>()(
           tokens,
           isAuthenticated: true,
         });
+      },
+      updateUser: (data) => {
+        const currentUser = get().user;
+        if (currentUser) {
+          set({ user: { ...currentUser, ...data } });
+        }
       },
       logout: () => set({ user: null, tokens: null, isAuthenticated: false }),
       refresh: async () => {

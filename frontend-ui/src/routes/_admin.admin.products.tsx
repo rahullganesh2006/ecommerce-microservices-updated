@@ -80,6 +80,7 @@ function AdminProducts() {
         product_id: formData.product_id,
         available_stock: stockNum,
         reserved_stock: 0,
+        warehouse_location: "Primary Fulfillment Center",
       });
     },
     onSuccess: () => {

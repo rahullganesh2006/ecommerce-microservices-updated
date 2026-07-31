@@ -15,8 +15,8 @@ import { signUp } from "aws-amplify/auth";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — CloudCart Commerce" },
-      { name: "description", content: "Sign in to the CloudCart enterprise commerce platform." },
+      { title: "Sign in — Angadi Hub Commerce" },
+      { name: "description", content: "Sign in to the Angadi Hub enterprise commerce platform." },
     ],
   }),
   component: LoginPage,
@@ -66,10 +66,13 @@ function LoginPage() {
         const groups = payload["cognito:groups"] || [];
         const role = groups.includes("ADMIN") ? "ADMIN" : "CUSTOMER";
 
+        const { fetchUserAttributes } = await import("aws-amplify/auth");
+        const attributes = await fetchUserAttributes();
+
         const user = {
           id: payload.sub as string,
           email: payload.email as string,
-          name: (payload.name || payload.email) as string,
+          name: (attributes.name || payload.name || payload.email) as string,
           role: role as Role,
         };
 
@@ -120,10 +123,10 @@ function LoginPage() {
           <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, white 0.5px, transparent 1px), radial-gradient(circle at 70% 60%, white 0.5px, transparent 1px)", backgroundSize: "60px 60px, 90px 90px" }} />
           <div className="relative flex h-full flex-col justify-between p-12 text-primary-foreground">
             <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 backdrop-blur">
-                <Cloud className="h-5 w-5" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 backdrop-blur overflow-hidden">
+                <img src="/logo.jpg" alt="Angadi Hub Logo" className="w-full h-full object-cover" />
               </div>
-              <span className="text-lg font-semibold tracking-tight">CloudCart</span>
+              <span className="text-lg font-semibold tracking-tight">Angadi Hub</span>
             </div>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <h1 className="text-4xl font-bold leading-tight tracking-tight">
@@ -147,7 +150,7 @@ function LoginPage() {
                 ))}
               </div>
             </motion.div>
-            <div className="text-xs text-white/60">© 2026 CloudCart Commerce Platform</div>
+            <div className="text-xs text-white/60">© 2026 Angadi Hub Commerce Platform</div>
           </div>
         </div>
 
@@ -160,10 +163,10 @@ function LoginPage() {
             className="w-full max-w-md"
           >
             <div className="mb-8 flex items-center gap-2 lg:hidden">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand">
-                <Cloud className="h-5 w-5 text-primary-foreground" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand shadow-glow overflow-hidden">
+                <img src="/logo.jpg" alt="Angadi Hub Logo" className="w-full h-full object-cover" />
               </div>
-              <span className="text-lg font-semibold">CloudCart</span>
+              <span className="text-lg font-semibold">Angadi Hub</span>
             </div>
 
             <h2 className="text-2xl font-semibold tracking-tight">

@@ -93,7 +93,7 @@ function NotificationsPage() {
     i: Bell,
     tone: "text-muted-foreground bg-muted",
     t: "System deploy",
-    d: "CloudCart Architecture updated to use Microservices",
+    d: "Angadi Hub Architecture updated to use Microservices",
     ts: 0, // Always at bottom
     time: "System"
   });

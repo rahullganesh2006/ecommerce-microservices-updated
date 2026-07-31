@@ -32,6 +32,7 @@ import { Route as AdminAdminInventoryRouteImport } from './routes/_admin.admin.i
 import { Route as AdminAdminDashboardRouteImport } from './routes/_admin.admin.dashboard'
 import { Route as AdminAdminCustomersRouteImport } from './routes/_admin.admin.customers'
 import { Route as AdminAdminAnalyticsRouteImport } from './routes/_admin.admin.analytics'
+import { Route as CustomerShopProductsProductIdRouteImport } from './routes/_customer.shop.products_.$productId'
 
 const UnauthorizedRoute = UnauthorizedRouteImport.update({
   id: '/unauthorized',
@@ -146,6 +147,12 @@ const AdminAdminAnalyticsRoute = AdminAdminAnalyticsRouteImport.update({
   path: '/admin/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
+const CustomerShopProductsProductIdRoute =
+  CustomerShopProductsProductIdRouteImport.update({
+    id: '/shop/products_/$productId',
+    path: '/shop/products/$productId',
+    getParentRoute: () => CustomerRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/shop/settings': typeof CustomerShopSettingsRoute
   '/shop/wishlist': typeof CustomerShopWishlistRoute
   '/shop/': typeof CustomerShopIndexRoute
+  '/shop/products/$productId': typeof CustomerShopProductsProductIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -192,6 +200,7 @@ export interface FileRoutesByTo {
   '/shop/settings': typeof CustomerShopSettingsRoute
   '/shop/wishlist': typeof CustomerShopWishlistRoute
   '/shop': typeof CustomerShopIndexRoute
+  '/shop/products/$productId': typeof CustomerShopProductsProductIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -218,6 +227,7 @@ export interface FileRoutesById {
   '/_customer/shop/settings': typeof CustomerShopSettingsRoute
   '/_customer/shop/wishlist': typeof CustomerShopWishlistRoute
   '/_customer/shop/': typeof CustomerShopIndexRoute
+  '/_customer/shop/products_/$productId': typeof CustomerShopProductsProductIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/shop/settings'
     | '/shop/wishlist'
     | '/shop/'
+    | '/shop/products/$productId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -266,6 +277,7 @@ export interface FileRouteTypes {
     | '/shop/settings'
     | '/shop/wishlist'
     | '/shop'
+    | '/shop/products/$productId'
   id:
     | '__root__'
     | '/'
@@ -291,6 +303,7 @@ export interface FileRouteTypes {
     | '/_customer/shop/settings'
     | '/_customer/shop/wishlist'
     | '/_customer/shop/'
+    | '/_customer/shop/products_/$productId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -464,6 +477,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_customer/shop/products_/$productId': {
+      id: '/_customer/shop/products_/$productId'
+      path: '/shop/products/$productId'
+      fullPath: '/shop/products/$productId'
+      preLoaderRoute: typeof CustomerShopProductsProductIdRouteImport
+      parentRoute: typeof CustomerRoute
+    }
   }
 }
 
@@ -504,6 +524,7 @@ interface CustomerRouteChildren {
   CustomerShopSettingsRoute: typeof CustomerShopSettingsRoute
   CustomerShopWishlistRoute: typeof CustomerShopWishlistRoute
   CustomerShopIndexRoute: typeof CustomerShopIndexRoute
+  CustomerShopProductsProductIdRoute: typeof CustomerShopProductsProductIdRoute
 }
 
 const CustomerRouteChildren: CustomerRouteChildren = {
@@ -515,6 +536,7 @@ const CustomerRouteChildren: CustomerRouteChildren = {
   CustomerShopSettingsRoute: CustomerShopSettingsRoute,
   CustomerShopWishlistRoute: CustomerShopWishlistRoute,
   CustomerShopIndexRoute: CustomerShopIndexRoute,
+  CustomerShopProductsProductIdRoute: CustomerShopProductsProductIdRoute,
 }
 
 const CustomerRouteWithChildren = CustomerRoute._addFileChildren(
