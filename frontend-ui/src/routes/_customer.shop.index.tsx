@@ -1,9 +1,18 @@
+import React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Package, Truck, Sparkles, Percent } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 import { useAuth } from "@/lib/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
@@ -15,6 +24,11 @@ export const Route = createFileRoute("/_customer/shop/")({
 function CustomerHome() {
   const user = useAuth((s) => s.user);
   
+  // Use a ref for the Autoplay plugin to prevent infinite re-renders
+  const autoplayPlugin = React.useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: true })
+  );
+
   const { data: response, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: () => api.products.list(),
@@ -27,22 +41,90 @@ function CustomerHome() {
 
   return (
     <div className="space-y-10">
-      {/* Hero */}
-      <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-hero p-8 sm:p-12 text-primary-foreground shadow-elegant">
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, white 0.5px, transparent 1px)", backgroundSize: "40px 40px" }} />
-        <div className="relative max-w-2xl">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs backdrop-blur">
-            <Sparkles className="h-3 w-3" /> Welcome back, {user?.name?.split(" ")[0]}
-          </div>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Discover premium tech, delivered by AWS.</h1>
-          <p className="mt-3 max-w-lg text-white/85">Curated products, low-latency checkout, and real-time order tracking on our serverless platform.</p>
-          <div className="mt-6 flex gap-3">
-            <Button asChild size="lg" variant="secondary"><Link to="/shop/products">Shop products <ArrowRight className="ml-1.5 h-4 w-4" /></Link></Button>
-            <Button asChild size="lg" variant="ghost" className="border border-white/25 text-primary-foreground hover:bg-white/10 hover:text-primary-foreground"><Link to="/shop/orders">Track order</Link></Button>
-          </div>
-        </div>
-      </motion.section>
+      {/* Hero Carousel */}
+      <Carousel
+        plugins={[autoplayPlugin.current]}
+        className="w-full"
+        onMouseEnter={autoplayPlugin.current.stop}
+        onMouseLeave={autoplayPlugin.current.reset}
+      >
+        <CarouselContent>
+          {/* Slide 1 */}
+          <CarouselItem>
+            <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-3xl p-8 sm:p-12 text-white shadow-elegant h-[400px] flex items-center"
+            >
+              <div 
+                className="absolute inset-0 bg-cover bg-center" 
+                style={{ backgroundImage: "url('/images/banners/carousel_banner_1_1785478567235.jpg')" }} 
+              />
+              <div className="absolute inset-0 bg-black/40" />
+              <div className="relative max-w-2xl z-10">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs backdrop-blur border border-white/10">
+                  <Sparkles className="h-3 w-3 text-blue-300" /> Premium Collection
+                </div>
+                <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl drop-shadow-md">Next-Gen Tech, <br/><span className="text-blue-300">Unleashed.</span></h1>
+                <p className="mt-3 max-w-lg text-white/90 drop-shadow-sm text-lg">Experience the future with our curated selection of high-performance devices.</p>
+                <div className="mt-8">
+                  <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-500/30">
+                    <Link to="/shop/products">Shop Now <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+                  </Button>
+                </div>
+              </div>
+            </motion.section>
+          </CarouselItem>
+
+          {/* Slide 2 */}
+          <CarouselItem>
+            <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              className="relative overflow-hidden rounded-3xl p-8 sm:p-12 text-white shadow-elegant h-[400px] flex items-center"
+            >
+              <div 
+                className="absolute inset-0 bg-cover bg-center" 
+                style={{ backgroundImage: "url('/images/banners/carousel_banner_2_1785478579139.jpg')" }} 
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
+              <div className="relative max-w-2xl z-10">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs backdrop-blur border border-white/10">
+                  <Truck className="h-3 w-3 text-purple-300" /> Lightning Fast
+                </div>
+                <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl drop-shadow-md">Ultra-Fast <br/><span className="text-purple-300">Delivery.</span></h1>
+                <p className="mt-3 max-w-lg text-white/90 drop-shadow-sm text-lg">Order today, receive it tomorrow. Our serverless fulfillment gets it to you faster.</p>
+                <div className="mt-8 flex gap-3">
+                  <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-500 text-white rounded-full shadow-lg shadow-purple-500/30">
+                    <Link to="/shop/orders">Track Orders</Link>
+                  </Button>
+                </div>
+              </div>
+            </motion.section>
+          </CarouselItem>
+
+          {/* Slide 3 */}
+          <CarouselItem>
+            <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              className="relative overflow-hidden rounded-3xl p-8 sm:p-12 text-white shadow-elegant h-[400px] flex items-center"
+            >
+              <div 
+                className="absolute inset-0 bg-cover bg-center" 
+                style={{ backgroundImage: "url('/images/banners/carousel_banner_3_1785478591370.jpg')" }} 
+              />
+              <div className="absolute inset-0 bg-black/30" />
+              <div className="relative max-w-2xl z-10">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs backdrop-blur border border-white/10">
+                  <Percent className="h-3 w-3 text-pink-300" /> Special Offer
+                </div>
+                <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl drop-shadow-md">Big Savings <br/><span className="text-pink-300">Every Day.</span></h1>
+                <p className="mt-3 max-w-lg text-white/90 drop-shadow-sm text-lg">Explore massive discounts on top-tier electronics. Don't miss out.</p>
+                <div className="mt-8">
+                  <Button asChild size="lg" className="bg-pink-600 hover:bg-pink-500 text-white rounded-full shadow-lg shadow-pink-500/30">
+                    <Link to="/shop/products">View Deals <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+                  </Button>
+                </div>
+              </div>
+            </motion.section>
+          </CarouselItem>
+        </CarouselContent>
+      </Carousel>
 
       {/* Quick stats */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

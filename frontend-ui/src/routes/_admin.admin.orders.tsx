@@ -31,6 +31,22 @@ function formatOrderDate(order_id: string) {
   return d ? d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Unknown date";
 }
 
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  "Placed": ["Processing", "Cancelled"],
+  "Processing": ["Shipped", "Cancelled"],
+  "Shipped": ["Delivered"],
+  "Delivered": [],
+  "Cancelled": []
+};
+
+const STATUS_STYLES: Record<string, string> = {
+  "Placed": "bg-slate-50 text-slate-700 ring-1 ring-inset ring-slate-600/20 hover:bg-slate-100 dark:bg-slate-500/10 dark:text-slate-400 dark:ring-slate-500/20",
+  "Processing": "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20",
+  "Shipped": "bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-600/20 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:ring-indigo-500/20",
+  "Delivered": "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20",
+  "Cancelled": "bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/20 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/20"
+};
+
 function OrderTable({ list, isLoading }: { list: Order[], isLoading: boolean }) {
   const queryClient = useQueryClient();
   const updateStatus = useMutation({
@@ -39,7 +55,17 @@ function OrderTable({ list, isLoading }: { list: Order[], isLoading: boolean }) 
       toast.success("Order status updated");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
-    onError: () => toast.error("Failed to update order status")
+    onError: (err: any) => {
+      let msg = err.message || "Failed to update order status";
+      try {
+        if (msg.includes("API 400:")) {
+          const jsonStr = msg.split("API 400: ")[1];
+          const parsed = JSON.parse(jsonStr);
+          if (parsed.detail) msg = parsed.detail;
+        }
+      } catch (e) {}
+      toast.error(msg);
+    }
   });
 
   if (isLoading) {
@@ -76,15 +102,20 @@ function OrderTable({ list, isLoading }: { list: Order[], isLoading: boolean }) 
             <TableCell>₹{o.total_amount}</TableCell>
             <TableCell>
               <Select defaultValue={o.order_status} onValueChange={(val) => updateStatus.mutate({ id: o.order_id, status: val })}>
-                <SelectTrigger className="w-[130px] h-8 text-xs">
+                <SelectTrigger className={`w-[110px] h-7 px-2.5 text-[11px] font-medium ${STATUS_STYLES[o.order_status || "Placed"] || "bg-muted"}`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Placed">Placed</SelectItem>
-                  <SelectItem value="Processing">Processing</SelectItem>
-                  <SelectItem value="Shipped">Shipped</SelectItem>
-                  <SelectItem value="Delivered">Delivered</SelectItem>
-                  <SelectItem value="Cancelled">Cancelled</SelectItem>
+                  {["Placed", "Processing", "Shipped", "Delivered", "Cancelled"].map(val => {
+                    const currentStatus = o.order_status || "Placed";
+                    const allowed = VALID_TRANSITIONS[currentStatus] || [];
+                    const isAllowed = val === currentStatus || allowed.includes(val);
+                    return (
+                      <SelectItem key={val} value={val} disabled={!isAllowed} className="font-medium cursor-pointer">
+                        {val}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </TableCell>

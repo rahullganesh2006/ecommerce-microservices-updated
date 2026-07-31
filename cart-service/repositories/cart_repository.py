@@ -35,6 +35,21 @@ class CartRepository:
         return item
 
     @staticmethod
+    def get_all_carts():
+        response = cart_table.scan()
+        items = response.get("Items", [])
+        result = []
+        for item in items:
+            converted = {}
+            for key, value in item.items():
+                if isinstance(value, Decimal):
+                    converted[key] = float(value)
+                else:
+                    converted[key] = value
+            result.append(converted)
+        return result
+
+    @staticmethod
     def get_cart_by_customer(customer_id: str):
 
         response = cart_table.scan(

@@ -72,6 +72,8 @@ export const api = {
 
   // ─── Cart ───────────────────────────────────────────────
   cart: {
+    listAll: () =>
+      request<any[]>(API.CART, "/cart/all"),
     add: (data: AddToCartRequest) =>
       request<ApiResponse<CartItemResponse>>(API.CART, "/cart/add", {
         method: "POST",

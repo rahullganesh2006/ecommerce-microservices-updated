@@ -57,6 +57,10 @@ class CartService:
         return CartRepository.add_to_cart(cart_item)
 
     @staticmethod
+    def get_all_carts():
+        return CartRepository.get_all_carts()
+
+    @staticmethod
     def get_customer_cart(customer_id):
 
         items = CartRepository.get_cart_by_customer(

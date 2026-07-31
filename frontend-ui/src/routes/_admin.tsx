@@ -33,7 +33,6 @@ const NAV = [
   { to: "/admin/customers", icon: Users, label: "Customers" },
   { to: "/admin/analytics", icon: BarChart3, label: "Analytics" },
   { to: "/admin/reports", icon: FileText, label: "Reports" },
-  { to: "/admin/notifications", icon: Bell, label: "Notifications" },
   { to: "/admin/settings", icon: Settings, label: "Settings" },
 ] as const;
 
@@ -132,7 +131,7 @@ function AdminLayout() {
               <Input placeholder="Search orders, products, customers…" className="pl-9 bg-muted/50 border-transparent focus-visible:bg-background" />
             </div>
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative" onClick={() => nav({ to: "/admin/notifications" })}>
                 <Bell className="h-4 w-4" />
                 <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-primary" />
               </Button>

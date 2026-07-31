@@ -2,10 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Warehouse } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertTriangle, Warehouse, Pencil, Loader2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_admin/admin/inventory")({
   component: AdminInventory,
@@ -23,6 +28,35 @@ function AdminInventory() {
   });
 
   const isLoading = loadingProducts || loadingInventory;
+  const queryClient = useQueryClient();
+  const [isAdjustOpen, setIsAdjustOpen] = useState(false);
+  const [adjustData, setAdjustData] = useState({ product_id: "", name: "", available_stock: 0, new_stock: 0 });
+
+  const updateStockMutation = useMutation({
+    mutationFn: async () => {
+      await api.inventory.update(`inv_${adjustData.product_id}`, {
+        available_stock: adjustData.new_stock,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Stock adjusted successfully!");
+      setIsAdjustOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to adjust stock");
+    },
+  });
+
+  const handleAdjustSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateStockMutation.mutate();
+  };
+
+  const openAdjustDialog = (item: any) => {
+    setAdjustData({ ...item, new_stock: item.available_stock });
+    setIsAdjustOpen(true);
+  };
 
   const mergedData = useMemo(() => {
     const products = productsRes?.data || [];
@@ -87,7 +121,10 @@ function AdminInventory() {
                       <div className="flex items-center gap-2">
                         {item.available_stock === 0 && <Badge variant="destructive">Out</Badge>}
                         {item.available_stock > 0 && item.available_stock < 20 && <Badge className="bg-warning/10 text-warning border-0">Low</Badge>}
-                        <span className="tabular-nums">{item.available_stock} units</span>
+                        <span className="tabular-nums font-semibold w-16 text-right">{item.available_stock} units</span>
+                        <Button size="icon" variant="ghost" className="h-6 w-6 ml-2" onClick={() => openAdjustDialog(item)}>
+                          <Pencil className="h-3 w-3" />
+                        </Button>
                       </div>
                     </div>
                     <Progress value={pct} className="h-2" />
@@ -98,6 +135,33 @@ function AdminInventory() {
           )}
         </CardContent>
       </Card>
+      <Dialog open={isAdjustOpen} onOpenChange={setIsAdjustOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Adjust Stock</DialogTitle>
+            <DialogDescription>
+              Manually override the inventory level for {adjustData.name} ({adjustData.product_id}).
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAdjustSubmit} className="space-y-4">
+            <div className="space-y-1">
+              <Label>Current Stock</Label>
+              <Input value={adjustData.available_stock} disabled className="bg-muted text-muted-foreground" />
+            </div>
+            <div className="space-y-1">
+              <Label>New Stock Level</Label>
+              <Input type="number" min="0" value={adjustData.new_stock} onChange={e => setAdjustData({...adjustData, new_stock: parseInt(e.target.value) || 0})} required />
+            </div>
+            <DialogFooter className="mt-6">
+              <Button type="button" variant="outline" onClick={() => setIsAdjustOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={updateStockMutation.isPending}>
+                {updateStockMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

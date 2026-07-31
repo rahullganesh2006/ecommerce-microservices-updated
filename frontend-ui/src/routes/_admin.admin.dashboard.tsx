@@ -37,20 +37,19 @@ function AdminDashboard() {
   const queryClient = useQueryClient();
 
   const addStockMutation = useMutation({
-    mutationFn: async (product: any) => {
-      // 1. Update Product catalog stock
-      const newStock = product.stock + 100;
-      await api.products.update(product.product_id, { stock: newStock });
+    mutationFn: async (item: any) => {
+      // Update Inventory tracking stock
+      const newStock = item.stock + 100;
+      await api.inventory.update(item.inventory_id, { available_stock: newStock });
       
-      // 2. Update Inventory tracking stock
-      const invRow = inventory.find((i: any) => i.product_id === product.product_id);
-      if (invRow) {
-        await api.inventory.update(invRow.inventory_id, { available_stock: invRow.available_stock + 100 });
+      // Keep Product catalog in sync
+      if (item.original_product) {
+        await api.products.update(item.product_id, { stock: newStock });
       }
-      return product;
+      return item;
     },
-    onSuccess: (product) => {
-      toast.success(`Added 100 stock to ${product.product_name}`);
+    onSuccess: (item) => {
+      toast.success(`Added 100 stock to ${item.product_name}`);
       queryClient.invalidateQueries({ queryKey: ["dashboard-products"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-inventory"] });
     },
@@ -93,19 +92,24 @@ function AdminDashboard() {
         totalRevenue += Number(p.amount || 0);
         
         // Extract payment date from ID or payment_time
-        let date = new Date();
+        let date: Date | null = null;
+        
         if (p.payment_time) {
-          try {
-            const parsed = new Date(p.payment_time);
-            if (!isNaN(parsed.getTime())) date = parsed;
-          } catch(e) {}
-        } else {
-           const parts = p.payment_id.split("-");
-           if (parts.length > 1) {
-             const ts = parseInt(parts[1], 10);
-             if (!isNaN(ts)) date = new Date(ts);
-           }
+          const parsed = new Date(p.payment_time);
+          if (!isNaN(parsed.getTime())) date = parsed;
         }
+        
+        if (!date && p.payment_id && p.payment_id.includes("-")) {
+           const ts = parseInt(p.payment_id.split("-")[1], 10);
+           if (!isNaN(ts) && ts > 1000000000000) date = new Date(ts);
+        }
+        
+        if (!date && p.order_id && p.order_id.includes("-")) {
+           const ts = parseInt(p.order_id.split("-")[1], 10);
+           if (!isNaN(ts) && ts > 1000000000000) date = new Date(ts);
+        }
+        
+        if (!date) date = new Date(); // Final fallback
         
         const dayStr = date.toLocaleDateString('default', { month: 'short', day: 'numeric' });
         if (dailyRev[dayStr] !== undefined) {
@@ -135,7 +139,20 @@ function AdminDashboard() {
     { l: "Active customers", v: dashboardData.activeCustomers.toLocaleString(), i: Users, tone: "text-success" },
   ];
 
-  const lowStock = products.filter((p) => p.stock > 0 && p.stock < 20);
+  const lowStock = useMemo(() => {
+    return inventory
+      .filter((inv: any) => inv.available_stock >= 0 && inv.available_stock < 20)
+      .map((inv: any) => {
+        const product = products.find((p: any) => p.product_id === inv.product_id);
+        return {
+          inventory_id: inv.inventory_id,
+          product_id: inv.product_id,
+          product_name: product?.product_name || `Product ${inv.product_id.substring(0, 8)}`,
+          stock: inv.available_stock,
+          original_product: product
+        };
+      });
+  }, [inventory, products]);
 
   return (
     <div className="space-y-6">

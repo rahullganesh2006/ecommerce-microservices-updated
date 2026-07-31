@@ -63,10 +63,16 @@ def update_order(
     order: OrderUpdate
 ):
 
-    updated = OrderService.update_order(
-        order_id,
-        order
-    )
+    try:
+        updated = OrderService.update_order(
+            order_id,
+            order
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
     if updated is None:
         raise HTTPException(

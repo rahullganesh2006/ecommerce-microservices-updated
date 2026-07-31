@@ -46,6 +46,11 @@ def add_to_cart(
     }
 
 
+@router.get("/all")
+def get_all_carts(user=Depends(get_current_user)):
+    # Optional: ensure user is ADMIN
+    return CartService.get_all_carts()
+
 @router.get(
     "/customer/{customer_id}"
 )

@@ -38,39 +38,6 @@ interface AuthState {
   refresh: () => Promise<void>;
 }
 
-const mockAccounts: Record<string, { pw: string; user: AuthUser }> = {
-  "admin@cloudcart.io": {
-    pw: "admin",
-    user: {
-      id: "u_admin",
-      email: "admin@cloudcart.io",
-      name: "Rahull Ganesh",
-      role: "ADMIN",
-    },
-  },
-  "customer@cloudcart.io": {
-    pw: "customer",
-    user: {
-      id: "u_cust",
-      email: "customer@cloudcart.io",
-      name: "",
-      role: "CUSTOMER",
-    },
-  },
-};
-
-function mintTokens(): AuthTokens {
-  const now = Date.now();
-  return {
-    accessToken: `mock.jwt.${btoa(String(now))}`,
-    refreshToken: `mock.refresh.${btoa(String(now))}`,
-    idToken: `mock.id.${btoa(String(now))}`,
-    expiresAt: now + 60 * 60 * 1000,
-  };
-}
-
-// Mock Cognito — replace with @aws-amplify/auth in production
-
 export const useAuth = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -78,26 +45,19 @@ export const useAuth = create<AuthState>()(
       tokens: null,
       isAuthenticated: false,
       login: async (email, password) => {
-        await new Promise((r) => setTimeout(r, 700));
-        const acct = mockAccounts[email.toLowerCase()];
-        if (!acct || acct.pw !== password) {
-          throw new Error("Invalid email or password");
-        }
-        set({ user: acct.user, tokens: mintTokens(), isAuthenticated: true });
-        return acct.user;
+        // Deprecated: Login logic moved to login.tsx for OTP and Google flows
+        throw new Error("Use setAuth after login flow");
       },
       setAuth: (user, tokens) => {
-      set({
+        set({
           user,
-    tokens,
-    isAuthenticated: true,
-  });
-},
+          tokens,
+          isAuthenticated: true,
+        });
+      },
       logout: () => set({ user: null, tokens: null, isAuthenticated: false }),
       refresh: async () => {
-        const { tokens } = get();
-        if (!tokens) return;
-        set({ tokens: mintTokens() });
+        // In a real app, hit the refresh endpoint here
       },
     }),
     { name: "cloudcart.auth" },

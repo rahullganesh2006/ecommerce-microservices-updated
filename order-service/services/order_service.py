@@ -45,6 +45,26 @@ class OrderService:
         if not existing:
             return None
 
+        # State Machine Validation for Order Status
+        if order.order_status:
+            current_status = existing.get("order_status", "Placed").upper().replace(" ", "_")
+            new_status = order.order_status.upper().replace(" ", "_")
+            
+            if current_status != new_status:
+                valid_transitions = {
+                    "PLACED": ["PROCESSING", "CANCELLED"],
+                    "ORDER_PLACED": ["PROCESSING", "CANCELLED"], # Backwards compatibility
+                    "PROCESSING": ["SHIPPED", "CANCELLED"],
+                    "SHIPPED": ["DELIVERED"],
+                    "DELIVERED": [],
+                    "CANCELLED": []
+                }
+                
+                allowed_next_states = valid_transitions.get(current_status, [])
+                if new_status not in allowed_next_states:
+                    raise ValueError(f"Invalid transition: Cannot change from '{existing.get('order_status', 'Placed')}' to '{order.order_status}'")
+
+
         return OrderRepository.update_order(
             order_id,
             order

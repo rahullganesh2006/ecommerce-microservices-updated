@@ -27,6 +27,7 @@ export const Route = createFileRoute("/_admin/admin/products")({
 function AdminProducts() {
   const [q, setQ] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: response, isLoading } = useQuery({
@@ -39,6 +40,16 @@ function AdminProducts() {
 
   const [formData, setFormData] = useState({
     product_id: `P${Math.floor(Math.random() * 10000)}`,
+    product_name: "",
+    description: "",
+    category: "",
+    price: "",
+    stock: "",
+    image: "",
+  });
+
+  const [editFormData, setEditFormData] = useState({
+    product_id: "",
     product_name: "",
     description: "",
     category: "",
@@ -94,6 +105,46 @@ function AdminProducts() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     createProductMutation.mutate();
+  };
+
+  const updateProductMutation = useMutation({
+    mutationFn: async () => {
+      const priceNum = parseFloat(editFormData.price);
+      
+      await api.products.update(editFormData.product_id, {
+        product_name: editFormData.product_name,
+        description: editFormData.description,
+        category: editFormData.category,
+        price: priceNum,
+        image: editFormData.image,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Product updated successfully!");
+      setIsEditDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to update product");
+    },
+  });
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProductMutation.mutate();
+  };
+
+  const openEditDialog = (p: any) => {
+    setEditFormData({
+      product_id: p.product_id,
+      product_name: p.product_name,
+      description: p.description,
+      category: p.category,
+      price: p.price.toString(),
+      stock: p.stock.toString(),
+      image: p.image || "",
+    });
+    setIsEditDialogOpen(true);
   };
 
   return (
@@ -156,6 +207,56 @@ function AdminProducts() {
             </form>
           </DialogContent>
         </Dialog>
+
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Product</DialogTitle>
+              <DialogDescription>
+                Update product details. Note: Product ID and Stock cannot be changed here (Stock is managed by Inventory Service).
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div className="space-y-1">
+                <Label>Product ID (SKU)</Label>
+                <Input value={editFormData.product_id} disabled className="bg-muted text-muted-foreground" />
+              </div>
+              <div className="space-y-1">
+                <Label>Name</Label>
+                <Input value={editFormData.product_name} onChange={e => setEditFormData({...editFormData, product_name: e.target.value})} required />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label>Category</Label>
+                  <Input value={editFormData.category} onChange={e => setEditFormData({...editFormData, category: e.target.value})} required />
+                </div>
+                <div className="space-y-1">
+                  <Label>Price</Label>
+                  <Input type="number" step="0.01" value={editFormData.price} onChange={e => setEditFormData({...editFormData, price: e.target.value})} required />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label>Stock</Label>
+                <Input type="number" value={editFormData.stock} disabled className="bg-muted text-muted-foreground" />
+              </div>
+              <div className="space-y-1">
+                <Label>Description</Label>
+                <Input value={editFormData.description} onChange={e => setEditFormData({...editFormData, description: e.target.value})} required />
+              </div>
+              <div className="space-y-1">
+                <Label>Image URL (Optional)</Label>
+                <Input value={editFormData.image} onChange={e => setEditFormData({...editFormData, image: e.target.value})} placeholder="https://example.com/image.jpg" />
+              </div>
+              <DialogFooter className="mt-6">
+                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={updateProductMutation.isPending}>
+                  {updateProductMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Changes
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card className="shadow-soft">
@@ -190,7 +291,10 @@ function AdminProducts() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <img src={p.image || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"} alt="" className="h-10 w-10 rounded-lg object-cover" />
-                        <div className="font-medium">{p.product_name}</div>
+                        <div>
+                          <div className="font-medium">{p.product_name}</div>
+                          <div className="text-xs text-muted-foreground line-clamp-1 max-w-[200px]">{p.description}</div>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{p.product_id}</TableCell>
@@ -204,7 +308,7 @@ function AdminProducts() {
                           : <span>{p.stock}</span>}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button size="icon" variant="ghost" onClick={() => toast.success("Edit coming soon")}><Pencil className="h-3.5 w-3.5" /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => openEditDialog(p)}><Pencil className="h-3.5 w-3.5" /></Button>
                       <Button size="icon" variant="ghost" onClick={() => toast.success("Delete coming soon")}><Trash2 className="h-3.5 w-3.5" /></Button>
                     </TableCell>
                   </TableRow>
