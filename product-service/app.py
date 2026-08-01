@@ -54,5 +54,5 @@ app.include_router(router)
 handler = Mangum(
     app,
     lifespan="off",
-    api_gateway_base_path="/"
+    api_gateway_base_path="/v1"
 )
