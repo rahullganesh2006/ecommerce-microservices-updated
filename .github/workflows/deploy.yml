@@ -76,7 +76,7 @@ jobs:
       run: |
         # In a real environment, you'd pull the bucket name from Terraform outputs. 
         # Here we assume it's stored in a GitHub Secret for the action.
-        aws s3 sync frontend-ui/dist/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
+        aws s3 sync frontend-ui/.output/public/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
 
     - name: Invalidate CloudFront
       run: |
