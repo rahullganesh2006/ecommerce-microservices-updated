@@ -11,3 +11,5 @@ Amplify.configure({
     },
   },
 });
+
+export const initCognito = true;

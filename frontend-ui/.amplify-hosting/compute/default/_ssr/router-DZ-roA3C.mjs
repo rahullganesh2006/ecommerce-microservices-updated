@@ -7,7 +7,7 @@ import { t as Toaster } from "../_libs/sonner.mjs";
 import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
 import { r as QueryClientProvider } from "../_libs/tanstack__react-query.mjs";
 import { t as Route$24 } from "../_customer.shop.products_._productId-WdH1PwYu.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-BhmPeA9x.js
+//#region node_modules/.nitro/vite/services/ssr/assets/router-DZ-roA3C.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var styles_default = "/assets/styles-DgSWsI1y.css";
@@ -29,6 +29,7 @@ function reportLovableError(error, context = {}) {
 		filename: window.location.pathname
 	});
 }
+console.log("Cognito init:", true);
 function NotFoundComponent() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "flex min-h-screen items-center justify-center bg-background px-4",

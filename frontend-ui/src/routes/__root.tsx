@@ -1,4 +1,5 @@
-import "@/lib/cognito";
+import { initCognito } from "@/lib/cognito";
+console.log("Cognito init:", initCognito);
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
