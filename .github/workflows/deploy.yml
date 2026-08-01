@@ -25,7 +25,7 @@ jobs:
       run: |
         cd ${{ matrix.service }}
         mkdir -p package
-        pip install -r requirements.txt -t package/
+        pip install --platform manylinux2014_x86_64 --target=package --implementation cp --python-version 3.11 --only-binary=:all: --upgrade -r requirements.txt
         cp -r *.py package/ || true
         cp -r routers package/ || true
         cp -r schemas package/ || true
