@@ -14,7 +14,7 @@ resource "aws_lambda_function" "services" {
   for_each = var.services
 
   function_name = "${var.project_name}-${each.key}"
-  role          = data.aws_iam_role.lab_role.arn
+  role          = aws_iam_role.lambda_exec_role.arn
   handler       = "app.handler"
   runtime       = "python3.11"
   timeout       = 30
