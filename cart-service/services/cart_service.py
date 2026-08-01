@@ -157,7 +157,7 @@ class CartService:
                 CartRepository.remove_cart(item["cart_id"])
 
     @staticmethod
-    def checkout(customer_id, payment_method, shipping_address, items, access_token, background_tasks):
+    def checkout(customer_id: str, customer_name: str, email_notifications: bool, payment_method: str, shipping_address: str, items: list, access_token: str, background_tasks: BackgroundTasks):
 
         if not items:
             raise HTTPException(status_code=400, detail="Cart is empty")
@@ -183,6 +183,8 @@ class CartService:
         order_data = {
             "order_id": order_id,
             "customer_id": customer_id,
+            "customer_name": customer_name,
+            "email_notifications": email_notifications,
             "items": order_items,
             "shipping_address": shipping_address
         }

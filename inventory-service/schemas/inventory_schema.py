@@ -3,11 +3,11 @@ from typing import Optional
 
 
 class InventoryCreate(BaseModel):
-    inventory_id: str = Field(..., example="I101")
-    product_id: str = Field(..., example="P101")
+    inventory_id: str = Field(..., json_schema_extra={"example": "I101"})
+    product_id: str = Field(..., json_schema_extra={"example": "P101"})
     available_stock: int = Field(..., ge=0)
     reserved_stock: int = Field(default=0, ge=0)
-    warehouse_location: str = Field(..., example="Chennai")
+    warehouse_location: str = Field(..., json_schema_extra={"example": "Chennai"})
 
 
 class InventoryUpdate(BaseModel):

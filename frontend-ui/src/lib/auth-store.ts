@@ -14,6 +14,7 @@ export interface AuthUser {
   address?: string;
   city?: string;
   zip?: string;
+  emailNotifications?: boolean;
 }
 
 export interface AuthTokens {

@@ -106,6 +106,8 @@ def checkout(
 
     return CartService.checkout(
         customer_id,
+        request.customer_name or user.get("claims", {}).get("name"),
+        request.email_notifications,
         request.payment_method,
         request.shipping_address,
         [item.dict() for item in request.items],

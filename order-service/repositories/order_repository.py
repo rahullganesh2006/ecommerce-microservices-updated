@@ -30,6 +30,10 @@ class OrderRepository:
                 "order_id": order.order_id,
 
                 "customer_id": order.customer_id,
+                
+                "customer_name": order.customer_name,
+
+                "email_notifications": order.email_notifications,
 
                 "items": [
                     {

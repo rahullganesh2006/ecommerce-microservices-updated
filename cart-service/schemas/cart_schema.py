@@ -44,6 +44,8 @@ class CheckoutItem(BaseModel):
 class CheckoutRequest(BaseModel):
     payment_method: str
     shipping_address: str = "221 Baker Street, Apt 4B, San Francisco, 94103"
+    customer_name: str | None = None
+    email_notifications: bool = True
     items: List[CheckoutItem] = []
 
 

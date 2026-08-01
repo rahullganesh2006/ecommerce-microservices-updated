@@ -90,7 +90,7 @@ export const api = {
       request<ApiResponse<null>>(API.CART, `/cart/remove/${cartId}`, {
         method: "DELETE",
       }),
-    checkout: (customerId: string, data: { payment_method: string; shipping_address: string; items: any[] }) =>
+    checkout: (customerId: string, data: { payment_method: string; shipping_address: string; customer_name?: string; email_notifications?: boolean; items: any[] }) =>
       request<CheckoutResponse>(API.CART, `/cart/checkout/${customerId}`, {
         method: "POST",
         body: JSON.stringify(data),

@@ -5,3 +5,8 @@ PyJWT
 google-auth
 requests
 python-dotenv
+
+pytest
+pytest-mock
+moto[all]
+httpx

@@ -74,6 +74,8 @@ function CheckoutPage() {
       await api.cart.checkout(user.email, {
         payment_method: backendPaymentMethod,
         shipping_address: fullAddress,
+        customer_name: user?.name,
+        email_notifications: user?.emailNotifications ?? true,
         items: items.map(i => ({
           product_id: i.product.product_id || (i.product as any).id,
           product_name: i.product.product_name || (i.product as any).name,

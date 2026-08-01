@@ -11,16 +11,19 @@ class OrderItem(BaseModel):
 
 class OrderCreate(BaseModel):
 
-    order_id: str = Field(..., example="O101")
+    order_id: str = Field(..., json_schema_extra={"example": "O101"})
 
-    customer_id: str = Field(..., example="CUS101")
+    customer_id: str = Field(..., json_schema_extra={"example": "CUS101"})
+    
+    customer_name: Optional[str] = Field(None, json_schema_extra={"example": "John Doe"})
+    email_notifications: bool = True
 
     items: List[OrderItem]
 
     shipping_address: str = Field(
         ...,
-        example="Chennai"
-    )
+        json_schema_extra={"example": "Chennai"
+    })
 
 
 class OrderUpdate(BaseModel):
@@ -35,7 +38,8 @@ class OrderResponse(BaseModel):
     order_id: str
 
     customer_id: str
-
+    customer_name: str | None = None
+    email_notifications: bool = True
     items: List[OrderItem]
 
     total_amount: float

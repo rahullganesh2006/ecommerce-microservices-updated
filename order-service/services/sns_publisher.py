@@ -33,14 +33,25 @@ class SNSPublisher:
     def publish_order_placed(cls, order_item):
         topic_arn = config.order_placed_topic_arn
         
+        # Helper to convert Decimals to floats for JSON serialization
+        def serialize_item(item):
+            d = dict(item)
+            if "unit_price" in d and hasattr(d["unit_price"], "quantize"):
+                d["unit_price"] = float(d["unit_price"])
+            return d
+
+        total_amount = order_item.get("total_amount")
+        if hasattr(total_amount, "quantize"):
+            total_amount = float(total_amount)
+
         event = {
             "event_type": "ORDER_PLACED",
             "order_id": order_item.get("order_id"),
             "customer_id": order_item.get("customer_id"),
-            "product_id": order_item.get("product_id"),
-            "quantity": int(order_item.get("quantity", 1)),
-            "unit_price": order_item.get("unit_price"),
-            "total_amount": order_item.get("total_amount"),
+            "customer_name": order_item.get("customer_name"),
+            "email_notifications": order_item.get("email_notifications", True),
+            "items": [serialize_item(i) for i in order_item.get("items", [])],
+            "total_amount": total_amount,
             "shipping_address": order_item.get("shipping_address")
         }
 

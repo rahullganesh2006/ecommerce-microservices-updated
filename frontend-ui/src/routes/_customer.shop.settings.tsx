@@ -40,6 +40,8 @@ function SettingsPage() {
   const { dark, setDark } = useTheme();
   const nav = useNavigate();
   const logout = useAuth((s) => s.logout);
+  const user = useAuth((s) => s.user);
+  const updateUser = useAuth((s) => s.updateUser);
   const { paymentMethods, addPaymentMethod, removePaymentMethod, setDefault } = useBilling();
   
   const [currentPassword, setCurrentPassword] = useState("");
@@ -169,7 +171,11 @@ function SettingsPage() {
                       <Label className="text-base font-medium">Email Alerts</Label>
                       <p className="text-sm text-muted-foreground">Receive weekly digests and important account updates</p>
                     </div>
-                    <Switch defaultChecked className="data-[state=checked]:bg-primary" />
+                    <Switch 
+                      checked={user?.emailNotifications ?? true} 
+                      onCheckedChange={(checked) => updateUser({ emailNotifications: checked })}
+                      className="data-[state=checked]:bg-primary" 
+                    />
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">

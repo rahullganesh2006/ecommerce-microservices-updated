@@ -4,6 +4,7 @@ import jwt
 from fastapi import HTTPException
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from services.sns_publisher import SNSPublisher
 
 SECRET_KEY = "super-secret-jwt-key"
 ALGORITHM = "HS256"
@@ -30,6 +31,9 @@ class AuthService:
             "email": email,
             "password": password
         }
+        
+        SNSPublisher.publish_user_registered(USER_STORE[email])
+        
         return AuthService._generate_auth_response(email)
 
     @staticmethod
@@ -82,6 +86,7 @@ class AuthService:
                 "email": email,
                 "password": "" # No password since they use Google
             }
+            SNSPublisher.publish_user_registered(USER_STORE[email])
             
         user = USER_STORE[email]
         
