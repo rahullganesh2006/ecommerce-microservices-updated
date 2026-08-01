@@ -37,11 +37,15 @@ function AdminInventory() {
       await api.inventory.update(`inv_${adjustData.product_id}`, {
         available_stock: adjustData.new_stock,
       });
+      await api.products.update(adjustData.product_id, {
+        stock: adjustData.new_stock,
+      });
     },
     onSuccess: () => {
-      toast.success("Stock adjusted successfully!");
+      toast.success("Stock level adjusted successfully!");
       setIsAdjustOpen(false);
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : "Failed to adjust stock");

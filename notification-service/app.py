@@ -1,3 +1,4 @@
+from mangum import Mangum
 import asyncio
 from fastapi import FastAPI
 from services.queue_consumer import QueueConsumer
@@ -13,3 +14,6 @@ async def startup_event():
 @app.get("/health")
 def health_check():
     return {"status": "ok", "service": "notification"}
+
+
+handler = Mangum(app)

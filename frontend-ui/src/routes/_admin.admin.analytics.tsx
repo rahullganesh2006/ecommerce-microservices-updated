@@ -141,17 +141,52 @@ function AdminAnalytics() {
 
     // --- New Analytics ---
     const uniqueCustomers = new Set(orders.map(o => o.customer_id)).size;
-    const abandonedCartsCount = new Set(carts.map(c => c.customer_id)).size;
     
+    // Calculate Abandoned Cart Value
+    const abandonedCartsCount = new Set(carts.map(c => c.customer_id)).size;
+    let abandonedCartValue = 0;
+    carts.forEach(c => {
+      abandonedCartValue += Number(c.cart_total || c.total_price || 0);
+    });
+
     const totalCheckouts = orders.length;
     const conversionRate = (totalCheckouts > 0 || abandonedCartsCount > 0) 
       ? ((totalCheckouts / (totalCheckouts + abandonedCartsCount)) * 100).toFixed(1) 
       : "0";
 
     const funnelData = [
-      { name: "Completed Orders", v: totalCheckouts },
-      { name: "Abandoned Carts", v: abandonedCartsCount }
+      { name: "Completed Revenue", v: totalRevenue },
+      { name: "Lost (Abandoned)", v: abandonedCartValue }
     ].filter(d => d.v > 0);
+
+    // Payment Success Distribution
+    const paymentStatusMap: Record<string, number> = { SUCCESS: 0, PENDING: 0, FAILED: 0 };
+    payments.forEach(p => {
+      const s = (p.payment_status || "PENDING").toUpperCase();
+      if (paymentStatusMap[s] !== undefined) paymentStatusMap[s]++;
+      else paymentStatusMap[s] = 1;
+    });
+    const paymentDistribution = Object.entries(paymentStatusMap)
+      .filter(([_, v]) => v > 0)
+      .map(([name, v]) => ({ name, v }));
+
+    // Customer Lifetime Value & Retention
+    const clv = uniqueCustomers > 0 ? totalRevenue / uniqueCustomers : 0;
+    
+    const customerOrderCounts: Record<string, number> = {};
+    const customerSpend: Record<string, number> = {};
+    orders.forEach(o => {
+      customerOrderCounts[o.customer_id] = (customerOrderCounts[o.customer_id] || 0) + 1;
+      customerSpend[o.customer_id] = (customerSpend[o.customer_id] || 0) + Number(o.total_amount || 0);
+    });
+    
+    const repeatCustomers = Object.values(customerOrderCounts).filter(count => count > 1).length;
+    const retentionRate = uniqueCustomers > 0 ? ((repeatCustomers / uniqueCustomers) * 100).toFixed(1) : "0";
+
+    const topCustomers = Object.entries(customerSpend)
+      .map(([id, spend]) => ({ id, name: id.substring(0, 8), spend }))
+      .sort((a, b) => b.spend - a.spend)
+      .slice(0, 5);
 
     let totalStockUnits = 0;
     let lowStockCount = 0;
@@ -164,20 +199,22 @@ function AdminAnalytics() {
 
     return { 
       totalRevenue, totalItemsSold, aov, statusData, topProducts, revenueTrend,
-      uniqueCustomers, abandonedCartsCount, conversionRate, totalStockUnits, lowStockCount, avgLatency, funnelData
+      uniqueCustomers, abandonedCartsCount, abandonedCartValue, conversionRate, 
+      totalStockUnits, lowStockCount, avgLatency, funnelData,
+      paymentDistribution, clv, retentionRate, topCustomers
     };
   }, [orders, payments, carts, inventory]);
 
   const KPIS = [
     { l: "Total Revenue", v: `₹${analytics.totalRevenue.toLocaleString()}`, i: IndianRupee },
-    { l: "Total Orders", v: orders.length.toLocaleString(), i: ShoppingBag },
-    { l: "Unique Customers", v: analytics.uniqueCustomers.toLocaleString(), i: Users },
+    { l: "Avg Customer LTV", v: `₹${analytics.clv.toFixed(2)}`, i: Users },
+    { l: "Repeat Customers", v: `${analytics.retentionRate}%`, i: Users },
     { l: "Avg Order Value", v: `₹${analytics.aov.toFixed(2)}`, i: TrendingUp },
   ];
 
   const SECONDARY_KPIS = [
-    { l: "Conversion Rate", v: `${analytics.conversionRate}%`, i: Activity, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { l: "Abandoned Carts", v: analytics.abandonedCartsCount.toLocaleString(), i: ShoppingCart, color: "text-orange-500", bg: "bg-orange-500/10" },
+    { l: "Abandoned Cart Value", v: `₹${analytics.abandonedCartValue.toLocaleString()}`, i: ShoppingCart, color: "text-orange-500", bg: "bg-orange-500/10" },
+    { l: "Total Orders", v: orders.length.toLocaleString(), i: ShoppingBag, color: "text-blue-500", bg: "bg-blue-500/10" },
     { l: "Low Stock Alerts", v: analytics.lowStockCount.toLocaleString(), i: AlertTriangle, color: "text-red-500", bg: "bg-red-500/10" },
     { l: "Sys Latency (ms)", v: `${analytics.avgLatency}ms`, i: Activity, color: "text-emerald-500", bg: "bg-emerald-500/10" },
   ];
@@ -306,6 +343,48 @@ function AdminAnalytics() {
                 </ResponsiveContainer>
               ) : (
                 <div className="flex h-full items-center justify-center text-muted-foreground">No data available</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="shadow-soft">
+          <CardContent className="p-5">
+            <h3 className="font-semibold">Top Customers by Revenue</h3>
+            <div className="mt-4 h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analytics.topCustomers} layout="vertical" margin={{ left: 30, right: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
+                  <XAxis type="number" stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val}`} />
+                  <YAxis type="category" dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} width={120} />
+                  <Tooltip cursor={{ fill: "var(--color-muted)" }} contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8 }} />
+                  <Bar dataKey="spend" name="Total Spend" fill="var(--color-chart-4)" radius={[0, 4, 4, 0]} barSize={30} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-soft">
+          <CardContent className="p-5">
+            <h3 className="font-semibold">Payment Success Rate</h3>
+            <div className="mt-4 h-80">
+              {analytics.paymentDistribution.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={analytics.paymentDistribution} dataKey="v" nameKey="name" innerRadius={80} outerRadius={120} paddingAngle={2} stroke="none">
+                      {analytics.paymentDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.name === 'SUCCESS' ? 'var(--color-primary)' : entry.name === 'FAILED' ? 'var(--color-chart-5)' : 'var(--color-chart-2)'} />
+                      ))}
+                    </Pie>
+                    <Legend verticalAlign="bottom" height={36} />
+                    <Tooltip contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center text-muted-foreground">No payment data</div>
               )}
             </div>
           </CardContent>
