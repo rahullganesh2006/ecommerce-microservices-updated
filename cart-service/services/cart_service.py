@@ -2,7 +2,7 @@ import uuid
 import time
 import random
 
-from fastapi import HTTPException
+from fastapi import HTTPException, BackgroundTasks
 
 from clients.product_client import ProductClient
 from clients.inventory_client import InventoryClient
