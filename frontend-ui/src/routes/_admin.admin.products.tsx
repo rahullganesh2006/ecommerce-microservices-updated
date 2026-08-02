@@ -135,6 +135,32 @@ function AdminProducts() {
     updateProductMutation.mutate();
   };
 
+  const deleteProductMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      await api.products.delete(productId);
+      // Optional: Delete from inventory if desired
+      try {
+        await api.inventory.delete(`inv_${productId}`);
+      } catch (err) {
+        // Ignore if inventory doesn't exist
+      }
+    },
+    onSuccess: () => {
+      toast({ title: "Product deleted successfully!" });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+    },
+    onError: (err: any) => {
+      toast({ title: "Failed to delete product", description: err.message, variant: "destructive" });
+    }
+  });
+
+  const handleDelete = (productId: string) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      deleteProductMutation.mutate(productId);
+    }
+  };
+
   const openEditDialog = (p: any) => {
     setEditFormData({
       product_id: p.product_id,
@@ -310,7 +336,7 @@ function AdminProducts() {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button size="icon" variant="ghost" onClick={() => openEditDialog(p)}><Pencil className="h-3.5 w-3.5" /></Button>
-                      <Button size="icon" variant="ghost" onClick={() => toast.success("Delete coming soon")}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => handleDelete(p.product_id)} disabled={deleteProductMutation.isPending}><Trash2 className="h-3.5 w-3.5" /></Button>
                     </TableCell>
                   </TableRow>
                 ))
