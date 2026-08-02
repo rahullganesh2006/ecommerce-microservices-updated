@@ -1,8 +1,9 @@
 ﻿import urllib.request
 import urllib.error
 
-req = urllib.request.Request("https://109pcwez22.execute-api.us-east-1.amazonaws.com/v1/products/health")
-
+req = urllib.request.Request(
+    "https://109pcwez22.execute-api.us-east-1.amazonaws.com/v1/products"
+)
 try:
     with urllib.request.urlopen(req) as res:
         print(f"Status: {res.status}")

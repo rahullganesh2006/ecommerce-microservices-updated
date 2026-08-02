@@ -30,4 +30,4 @@ app.include_router(
     tags=["Cart"]
 )
 
-handler = Mangum(app)
+handler = Mangum(app, lifespan="off", api_gateway_base_path="/v1")

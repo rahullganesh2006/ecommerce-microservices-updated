@@ -16,4 +16,4 @@ def health_check():
     return {"status": "ok", "service": "notification"}
 
 
-handler = Mangum(app)
+handler = Mangum(app, lifespan="off", api_gateway_base_path="/v1")

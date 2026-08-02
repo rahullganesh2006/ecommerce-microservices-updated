@@ -55,4 +55,4 @@ def health():
 
 app.include_router(router)
 
-handler = Mangum(app, lifespan="off")
+handler = Mangum(app, lifespan="off", api_gateway_base_path="/v1")

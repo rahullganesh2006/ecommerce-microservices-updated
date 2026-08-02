@@ -38,4 +38,4 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8005)
 
 
-handler = Mangum(app)
+handler = Mangum(app, lifespan="off", api_gateway_base_path="/v1")
