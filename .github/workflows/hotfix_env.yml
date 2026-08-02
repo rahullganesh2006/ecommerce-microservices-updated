@@ -1,0 +1,28 @@
+﻿name: 'Hotfix Lambda Env Vars'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-env:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Update Lambda Environment Variables
+      run: |
+        BASE_URL="https://109pcwez22.execute-api.us-east-1.amazonaws.com/v1"
+        ENV_VARS="Variables={ENVIRONMENT=production,INVENTORY_SERVICE_URL=$BASE_URL,ORDER_SERVICE_URL=$BASE_URL,PAYMENT_SERVICE_URL=$BASE_URL,PRODUCT_SERVICE_URL=$BASE_URL,NOTIFICATION_SERVICE_URL=$BASE_URL,CART_SERVICE_URL=$BASE_URL,AUTH_SERVICE_URL=$BASE_URL}"
+        
+        SERVICES=("auth-service" "cart-service" "inventory-service" "notification-service" "order-service" "payment-service" "product-service")
+        
+        for SERVICE in "${SERVICES[@]}"; do
+          aws lambda update-function-configuration \
+            --function-name "angadi-hub-$SERVICE" \
+            --environment "$ENV_VARS"
+        done
