@@ -31,9 +31,9 @@ class ProductRepository:
 
             return item
 
-        except ClientError as e:
+        except Exception as e:
             from fastapi import HTTPException
-            raise HTTPException(status_code=400, detail=str(e.response["Error"]["Message"]))
+            raise HTTPException(status_code=400, detail=str(e))
 
     @staticmethod
     def get_all_products():
@@ -42,9 +42,9 @@ class ProductRepository:
 
             return response.get("Items", [])
 
-        except ClientError as e:
+        except Exception as e:
             from fastapi import HTTPException
-            raise HTTPException(status_code=400, detail=str(e.response["Error"]["Message"]))
+            raise HTTPException(status_code=400, detail=str(e))
 
     @staticmethod
     def get_product_by_id(product_id):
@@ -57,9 +57,9 @@ class ProductRepository:
 
             return response.get("Item")
 
-        except ClientError as e:
+        except Exception as e:
             from fastapi import HTTPException
-            raise HTTPException(status_code=400, detail=str(e.response["Error"]["Message"]))
+            raise HTTPException(status_code=400, detail=str(e))
 
     @staticmethod
     def update_product(product_id, product):
@@ -88,9 +88,9 @@ class ProductRepository:
 
             return item
 
-        except ClientError as e:
+        except Exception as e:
             from fastapi import HTTPException
-            raise HTTPException(status_code=400, detail=str(e.response["Error"]["Message"]))
+            raise HTTPException(status_code=400, detail=str(e))
 
     @staticmethod
     def delete_product(product_id):
@@ -114,6 +114,6 @@ class ProductRepository:
 
             return True
 
-        except ClientError as e:
+        except Exception as e:
             from fastapi import HTTPException
-            raise HTTPException(status_code=400, detail=str(e.response["Error"]["Message"]))
+            raise HTTPException(status_code=400, detail=str(e))
