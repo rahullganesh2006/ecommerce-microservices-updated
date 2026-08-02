@@ -14,7 +14,7 @@ class Config:
 
         # AWS Config
         self.aws_region = os.getenv("APP_REGION") or os.getenv("AWS_REGION") or "us-east-1"
-        self.table_name = os.getenv("TABLE_NAME", "orders")
+        self.table_name = os.getenv("TABLE_NAME", "rahull-orders")
         
         # SNS Config
         self.order_placed_topic_arn = os.getenv("ORDER_PLACED_TOPIC_ARN", "mock")

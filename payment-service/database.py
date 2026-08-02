@@ -15,5 +15,5 @@ else:
         region_name=os.getenv("APP_REGION", "us-east-1")
     )
 
-TABLE_NAME = os.getenv("TABLE_NAME", "rahull-payment")
+TABLE_NAME = os.getenv("TABLE_NAME", "rahull-payments")
 table = dynamodb.Table(TABLE_NAME)
