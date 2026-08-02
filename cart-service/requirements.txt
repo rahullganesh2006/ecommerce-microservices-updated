@@ -1,8 +1,1 @@
-fastapi
-uvicorn
-boto3
-python-dotenv
-python-jose[cryptography]
-requests
-httpx
-mangum
+慦瑳灡൩甊楶潣湲਍潢潴ള瀊瑹潨⵮潤整癮਍祰桴湯樭獯孥牣灹潴牧灡票൝爊煥敵瑳൳栊瑴硰਍慭杮浵਍
