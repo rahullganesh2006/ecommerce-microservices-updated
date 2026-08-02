@@ -32,6 +32,7 @@ jobs:
         cp -r services package/ || true
         cp -r clients package/ || true
         cp -r repositories package/ || true
+        cp -r utils package/ || true
         cd package
         zip -r ../${{ matrix.service }}.zip .
 
