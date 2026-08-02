@@ -1,1 +1,9 @@
-慦瑳灡൩甊楶潣湲਍祰慤瑮捩਍祐坊ൔ朊潯汧ⵥ畡桴਍敲畱獥獴਍祰桴湯搭瑯湥൶ഊ栊瑴硰਍
+fastapi
+uvicorn
+pydantic
+PyJWT
+google-auth
+requests
+python-dotenv
+
+httpx
