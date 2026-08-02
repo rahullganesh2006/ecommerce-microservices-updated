@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
+AWS_REGION = os.getenv("AWS_REGION", "ap-southeast-1")
 TABLE_NAME = os.getenv("DYNAMODB_TABLE", "rahull-cart")
 
 if os.getenv("AWS_LAMBDA_FUNCTION_NAME") is None:

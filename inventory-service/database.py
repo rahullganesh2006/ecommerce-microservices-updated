@@ -6,7 +6,7 @@ if os.getenv("AWS_LAMBDA_FUNCTION_NAME") is None:
     load_dotenv()
 
 TABLE_NAME = os.getenv("TABLE_NAME", "rahull-inventory")
-AWS_REGION = os.getenv("APP_REGION", "us-east-1")
+AWS_REGION = os.getenv("APP_REGION", "ap-southeast-1")
 
 if os.getenv("AWS_LAMBDA_FUNCTION_NAME") is None:
     session = boto3.Session(
