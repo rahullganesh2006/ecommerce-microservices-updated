@@ -7,7 +7,7 @@ if os.getenv("AWS_LAMBDA_FUNCTION_NAME") is None:
     load_dotenv(override=False)
 
 TABLE_NAME = os.getenv("TABLE_NAME", "rahull-products")
-AWS_REGION = os.getenv("APP_REGION", "ap-southeast-1")
+AWS_REGION = os.getenv("APP_REGION", "us-east-1")
 
 # Local development
 if os.getenv("AWS_LAMBDA_FUNCTION_NAME") is None:
