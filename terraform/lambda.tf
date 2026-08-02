@@ -3,7 +3,7 @@
 data "archive_file" "dummy_lambda" {
   type        = "zip"
   output_path = "${path.module}/dummy.zip"
-  
+
   source {
     content  = "def handler(event, context):\n    return {'statusCode': 200, 'body': 'Not initialized'}"
     filename = "app.py"
