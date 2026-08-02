@@ -95,8 +95,13 @@ function AdminDashboard() {
         let date: Date | null = null;
         
         if (p.payment_time) {
-          const parsed = new Date(p.payment_time);
-          if (!isNaN(parsed.getTime())) date = parsed;
+          const match = p.payment_time.match(/^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2}):(\d{2})$/);
+          if (match) {
+            date = new Date(`${match[3]}-${match[2]}-${match[1]}T${match[4]}:${match[5]}:${match[6]}`);
+          } else {
+            const parsed = new Date(p.payment_time);
+            if (!isNaN(parsed.getTime())) date = parsed;
+          }
         }
         
         if (!date && p.payment_id && p.payment_id.includes("-")) {
