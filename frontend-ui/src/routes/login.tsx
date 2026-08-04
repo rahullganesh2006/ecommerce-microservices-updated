@@ -2,7 +2,7 @@ import type { Role, AuthUser } from "@/lib/auth-store";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Cloud, Lock, Mail, Loader2, ShieldCheck, Zap, LayoutDashboard, User, KeyRound } from "lucide-react";
+import { Cloud, Lock, Mail, Loader2, ShieldCheck, Zap, LayoutDashboard, User, KeyRound, ShoppingBag, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -182,297 +182,275 @@ function LoginPage() {
 
   return (
     <GoogleOAuthProvider clientId="100000000000-dummyclientid.apps.googleusercontent.com">
-      <div className="grid min-h-screen lg:grid-cols-2 bg-background">
-        {/* Brand side */}
-        <div className="relative hidden overflow-hidden lg:block bg-[url('/luxury_login_bg.jpg')] bg-cover bg-center">
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/30 to-transparent" />
-          
-          <div className="relative flex h-full flex-col justify-between p-16 text-white z-10">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }} 
-              animate={{ opacity: 1, x: 0 }} 
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="flex items-center gap-4"
-            >
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl overflow-hidden">
-                <img src="/logo.jpg" alt="Angadi Hub Logo" className="w-full h-full object-cover mix-blend-overlay opacity-90" />
+      <div className="min-h-screen flex bg-[#FAFAF9] font-sans">
+        
+        {/* Left Side: E-Commerce Branding Showcase */}
+        <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-900 overflow-hidden">
+          {/* Fashion / E-commerce Background Image */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src="https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop" 
+              alt="Luxury Fashion" 
+              className="w-full h-full object-cover opacity-40 mix-blend-overlay"
+            />
+            {/* Amber gradient overlay for brand colors */}
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-900/40 via-zinc-900/80 to-zinc-900/90" />
+          </div>
+
+          <div className="relative z-10 w-full p-12 flex flex-col justify-between h-full">
+            {/* Top Branding */}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-10 w-10 bg-white rounded-lg p-1">
+                  <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover rounded-md" />
+                </div>
+                <span className="text-xl font-serif font-bold text-white tracking-wide">Angadi Hub</span>
               </div>
-              <span className="text-3xl font-extrabold tracking-tight text-white drop-shadow-md">Angadi Hub</span>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, y: 40 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-            >
-              <div className="inline-block px-4 py-1.5 mb-8 rounded-full bg-white/10 backdrop-blur-xl border border-white/30 text-xs font-bold tracking-[0.2em] uppercase text-white shadow-lg">
-                The Luxury Collection
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold tracking-widest uppercase mb-8">
+                <ShoppingBag className="w-3 h-3" />
+                <span>Premium E-Commerce</span>
               </div>
-              <h1 className="text-6xl font-black leading-[1.05] tracking-tight text-white drop-shadow-2xl">
-                Elevate your <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 font-serif italic pr-4">
-                  Lifestyle.
-                </span>
+            </div>
+
+            {/* Value Proposition */}
+            <div className="max-w-md">
+              <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6 leading-tight">
+                Curated Luxury for the <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500">Modern Shopper</span>
               </h1>
-              <p className="mt-8 max-w-md text-xl text-white/90 font-medium leading-relaxed drop-shadow-md">
-                Discover a curated selection of premium products. Access your personalized concierge dashboard.
-              </p>
               
-              <div className="mt-14 grid gap-8">
-                {[
-                  { i: ShieldCheck, t: "Private & Secure", d: "Bank-level encryption for your absolute peace of mind." },
-                  { i: Zap, t: "Priority Access", d: "Get early access to exclusive drops and VIP collections." },
-                ].map((f, idx) => (
-                  <motion.div 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.7, delay: 0.6 + (idx * 0.15) }}
-                    key={f.t} 
-                    className="flex items-start gap-5 group"
-                  >
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 group-hover:bg-white/20 transition-all duration-500 group-hover:scale-105 shadow-xl">
-                      <f.i className="h-6 w-6 text-amber-300" />
-                    </div>
-                    <div className="pt-1">
-                      <h3 className="text-lg font-bold text-white tracking-wide">{f.t}</h3>
-                      <p className="text-sm text-white/70 mt-1 leading-relaxed">{f.d}</p>
-                    </div>
-                  </motion.div>
+              <div className="space-y-6 mb-10">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                    <ShoppingBag className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold mb-1">Exclusive Collections</h3>
+                    <p className="text-zinc-400 text-sm leading-relaxed">Access limited-edition drops and member-only fashion lines before anyone else.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                    <Truck className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold mb-1">Complimentary Shipping</h3>
+                    <p className="text-zinc-400 text-sm leading-relaxed">Enjoy free premium global shipping and returns on all luxury orders.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Categories Ticker */}
+            <div className="border-t border-white/10 pt-6">
+              <p className="text-zinc-500 text-xs font-semibold uppercase tracking-widest mb-4">Shop By Category</p>
+              <div className="flex flex-wrap gap-3">
+                {['Men\'s Wear', 'Women\'s Fashion', 'Accessories', 'Luxury Watches', 'Footwear'].map((cat) => (
+                  <span key={cat} className="text-xs text-zinc-300 bg-white/5 border border-white/10 px-4 py-2 rounded-full hover:bg-amber-500/20 hover:text-amber-300 hover:border-amber-500/30 transition-colors cursor-pointer">
+                    {cat}
+                  </span>
                 ))}
               </div>
-            </motion.div>
-            <div className="text-sm font-semibold tracking-wider text-white/60 uppercase">© 2026 Angadi Hub Luxury</div>
+            </div>
           </div>
         </div>
 
-        {/* Form side */}
-        <div className="flex items-center justify-center p-6 sm:p-12 relative overflow-hidden bg-background">
-          {/* Subtle background glow */}
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+        {/* Right Side: Login Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative">
           
+          {/* Subtle Mobile Background Accents */}
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none lg:hidden" />
+
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, type: "spring", bounce: 0.3 }}
-            className="w-full max-w-md relative z-10"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="w-full max-w-[420px]"
           >
-            <div className="mb-12 flex items-center justify-center gap-3 lg:hidden">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-brand shadow-2xl overflow-hidden">
-                <img src="/logo.jpg" alt="Angadi Hub Logo" className="w-full h-full object-cover" />
-              </div>
-              <span className="text-3xl font-extrabold tracking-tight">Angadi Hub</span>
+            <div className="lg:hidden flex items-center justify-center mb-10">
+               <div className="h-14 w-14 bg-white rounded-xl shadow-md border border-amber-100 p-1">
+                 <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover rounded-lg" />
+               </div>
             </div>
 
-            <div className="text-center mb-10">
-              <h2 className="text-4xl font-bold tracking-tight text-foreground font-serif">
+            <div className="text-center lg:text-left mb-8">
+              <h2 className="text-3xl font-bold tracking-tight text-zinc-900 font-serif mb-2">
                 {mode === "login" ? "Welcome Back" : 
-                 mode === "register" ? "Join the Club" : 
+                 mode === "register" ? "Create an Account" : 
                  mode === "forgot_password" ? "Reset Password" : "Check Your Email"}
               </h2>
-              <p className="mt-3 text-base text-muted-foreground font-medium">
+              <p className="text-sm text-zinc-500">
                 {mode === "login" 
-                  ? "Sign in to access your exclusive benefits."
+                  ? "Sign in to view your cart and wishlists."
                   : mode === "register" 
-                    ? "Create an account to begin your premium journey."
+                    ? "Join to unlock member pricing and fast checkout."
                     : mode === "forgot_password"
                       ? "Enter your email to receive a password reset code."
                       : "Follow the instructions sent to your email."}
               </p>
             </div>
 
-            <div className="bg-card/40 backdrop-blur-2xl border border-border shadow-2xl rounded-[2rem] p-10 relative overflow-hidden">
-              {/* Card subtle inner glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+            <AnimatePresence mode="wait">
+              <motion.div 
+                key={mode} 
+                initial={{ opacity: 0, y: 10 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                exit={{ opacity: 0, y: -10 }} 
+                transition={{ duration: 0.3 }}
+                className="w-full bg-white rounded-[1.5rem] border border-zinc-100 shadow-xl p-8"
+              >
+                {mode === "login" || mode === "register" ? (
+                  <>
+                    <div className="w-full flex justify-center mb-6">
+                      <div className="w-full flex justify-center hover:opacity-90 transition-opacity">
+                        <GoogleLogin
+                          onSuccess={handleGoogleSuccess}
+                          onError={() => toast.error("Google login failed")}
+                          useOneTap
+                          shape="rectangular"
+                          theme="outline"
+                          size="large"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="relative mb-6">
+                      <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-zinc-200" /></div>
+                      <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest">
+                        <span className="bg-white px-4 text-zinc-400">Or continue with</span>
+                      </div>
+                    </div>
 
-              <AnimatePresence mode="wait">
-                <motion.div 
-                  key={mode} 
-                  initial={{ opacity: 0, y: 15 }} 
-                  animate={{ opacity: 1, y: 0 }} 
-                  exit={{ opacity: 0, y: -15 }} 
-                  transition={{ duration: 0.4 }}
-                  className="space-y-7 relative z-10"
-                >
-                  {mode === "login" || mode === "register" ? (
-                    <>
-                      <div className="flex justify-center">
-                        <div className="transform hover:scale-[1.02] transition-transform duration-300 w-full flex justify-center">
-                          <GoogleLogin
-                            onSuccess={handleGoogleSuccess}
-                            onError={() => toast.error("Google login failed")}
-                            useOneTap
-                            shape="pill"
-                            theme="outline"
-                            size="large"
-                          />
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      {mode === "register" && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-1.5">
+                          <Label htmlFor="name" className="text-xs font-semibold text-zinc-700 ml-1">Full Name</Label>
+                          <div className="relative group">
+                            <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-amber-500" />
+                            <Input id="name" type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" className="pl-10 h-12 bg-zinc-50/50 border-zinc-200 focus-visible:ring-amber-500 focus-visible:border-amber-500 rounded-xl transition-all shadow-sm text-zinc-900" autoComplete="name" />
+                          </div>
+                        </motion.div>
+                      )}
+                      
+                      <div className="space-y-1.5">
+                        <Label htmlFor="email" className="text-xs font-semibold text-zinc-700 ml-1">Email Address</Label>
+                        <div className="relative group">
+                          <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-amber-500" />
+                          <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" className="pl-10 h-12 bg-zinc-50/50 border-zinc-200 focus-visible:ring-amber-500 focus-visible:border-amber-500 rounded-xl transition-all shadow-sm text-zinc-900" autoComplete="email" />
                         </div>
                       </div>
                       
-                      <div className="relative">
-                        <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-                        <div className="relative flex justify-center text-xs uppercase font-bold tracking-widest">
-                          <span className="bg-card/80 backdrop-blur-xl px-4 text-muted-foreground">Or</span>
-                        </div>
-                      </div>
-
-                      <form onSubmit={handleSubmit} className="space-y-5">
-                        {mode === "register" && (
-                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-2">
-                            <Label htmlFor="name" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
-                            <div className="relative group">
-                              <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                              <Input id="name" type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" className="pl-12 h-14 bg-background/50 border-border focus-visible:ring-primary/50 rounded-2xl transition-all shadow-sm text-base" autoComplete="name" />
-                            </div>
-                          </motion.div>
-                        )}
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</Label>
-                          <div className="relative group">
-                            <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" className="pl-12 h-14 bg-background/50 border-border focus-visible:ring-primary/50 rounded-2xl transition-all shadow-sm text-base" autoComplete="email" />
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between ml-1">
-                            <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Password</Label>
-                            {mode === "login" && (
-                              <button type="button" className="text-xs font-bold tracking-wide text-primary hover:underline" onClick={() => setMode("forgot_password")}>Forgot password?</button>
-                            )}
-                          </div>
-                          <div className="relative group">
-                            <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="pl-12 h-14 bg-background/50 border-border focus-visible:ring-primary/50 rounded-2xl transition-all shadow-sm text-base" autoComplete={mode === "login" ? "current-password" : "new-password"} />
-                          </div>
-                        </div>
-
-                        <Button type="submit" disabled={loading} className="w-full h-14 rounded-2xl bg-gradient-brand shadow-glow hover:shadow-elegant text-lg font-bold tracking-wide transition-all duration-300 hover:-translate-y-1 mt-4">
-                          {loading ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : null}
-                          {mode === "login" ? "Sign In Securely" : "Create Account"}
-                        </Button>
-                        
-                        <div className="text-center text-sm font-medium text-muted-foreground pt-6">
-                          {mode === "login" ? (
-                            <>
-                              New to Angadi Hub?{" "}
-                              <button type="button" onClick={() => setMode("register")} className="font-bold text-foreground hover:text-primary transition-colors hover:underline">
-                                Request an Invite
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              Already a member?{" "}
-                              <button type="button" onClick={() => setMode("login")} className="font-bold text-foreground hover:text-primary transition-colors hover:underline">
-                                Sign In
-                              </button>
-                            </>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between ml-1">
+                          <Label htmlFor="password" className="text-xs font-semibold text-zinc-700">Password</Label>
+                          {mode === "login" && (
+                            <button type="button" className="text-xs font-medium text-amber-600 hover:text-amber-700 hover:underline transition-colors" onClick={() => setMode("forgot_password")}>Forgot password?</button>
                           )}
                         </div>
-                      </form>
-                    </>
-                  ) : mode === "verify" ? (
-                    <form onSubmit={handleVerify} className="space-y-5">
-                      <div className="text-center mb-6">
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                          <KeyRound className="h-8 w-8 text-primary" />
-                        </div>
-                        <h3 className="text-2xl font-bold font-serif text-foreground">Verify Your Account</h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          We've sent a verification code to <span className="font-semibold text-foreground">{email || "your email"}</span>.
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="otp" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Verification Code</Label>
                         <div className="relative group">
-                          <KeyRound className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                          <Input id="otp" type="text" required value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter 6-digit code" className="pl-12 h-14 bg-background/50 border-border focus-visible:ring-primary/50 rounded-2xl transition-all shadow-sm text-base text-center tracking-widest" autoComplete="one-time-code" />
+                          <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-amber-500" />
+                          <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="pl-10 h-12 bg-zinc-50/50 border-zinc-200 focus-visible:ring-amber-500 focus-visible:border-amber-500 rounded-xl transition-all shadow-sm text-zinc-900" autoComplete={mode === "login" ? "current-password" : "new-password"} />
                         </div>
                       </div>
 
-                      <Button type="submit" disabled={loading || !otp} className="w-full h-14 rounded-2xl bg-gradient-brand shadow-glow hover:shadow-elegant text-lg font-bold tracking-wide transition-all duration-300 hover:-translate-y-1 mt-4">
-                        {loading ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : null}
-                        Verify Account
+                      <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white shadow-md hover:shadow-lg border border-transparent text-sm font-semibold tracking-wide transition-all mt-6">
+                        {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {mode === "login" ? "Sign In to Shop" : "Create Account"}
                       </Button>
                       
-                      <div className="text-center text-sm font-medium text-muted-foreground pt-4">
-                        <button type="button" onClick={() => setMode("login")} className="font-bold text-foreground hover:text-primary transition-colors hover:underline">
-                          Back to Sign In
-                        </button>
+                      <div className="text-center text-sm font-medium text-zinc-500 pt-5">
+                        {mode === "login" ? (
+                          <>
+                            New to Angadi Hub?{" "}
+                            <button type="button" onClick={() => setMode("register")} className="font-semibold text-zinc-900 hover:text-amber-600 transition-colors hover:underline">
+                              Create an Account
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            Already a member?{" "}
+                            <button type="button" onClick={() => setMode("login")} className="font-semibold text-zinc-900 hover:text-amber-600 transition-colors hover:underline">
+                              Sign In
+                            </button>
+                          </>
+                        )}
                       </div>
                     </form>
-                  ) : mode === "forgot_password" ? (
-                    <form onSubmit={handleForgotPassword} className="space-y-5">
-                      <div className="text-center mb-6">
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                          <KeyRound className="h-8 w-8 text-primary" />
-                        </div>
+                  </>
+                ) : mode === "verify" ? (
+                  <form onSubmit={handleVerify} className="space-y-5 w-full">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="otp" className="text-xs font-semibold text-zinc-700 ml-1">Verification Code</Label>
+                      <div className="relative group">
+                        <KeyRound className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-amber-500" />
+                        <Input id="otp" type="text" required value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter 6-digit code" className="pl-10 h-12 bg-zinc-50/50 border-zinc-200 focus-visible:ring-amber-500 focus-visible:border-amber-500 rounded-xl transition-all shadow-sm text-zinc-900 text-center tracking-widest text-lg" autoComplete="one-time-code" />
                       </div>
+                    </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="forgot-email" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</Label>
-                        <div className="relative group">
-                          <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                          <Input id="forgot-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" className="pl-12 h-14 bg-background/50 border-border focus-visible:ring-primary/50 rounded-2xl transition-all shadow-sm text-base" />
-                        </div>
+                    <Button type="submit" disabled={loading || !otp} className="w-full h-12 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white shadow-md text-sm font-semibold transition-all mt-2">
+                      {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Verify Account
+                    </Button>
+                    
+                    <div className="text-center text-sm pt-4">
+                      <button type="button" onClick={() => setMode("login")} className="font-medium text-zinc-500 hover:text-zinc-900 transition-colors">
+                        Back to Sign In
+                      </button>
+                    </div>
+                  </form>
+                ) : mode === "forgot_password" ? (
+                  <form onSubmit={handleForgotPassword} className="space-y-5 w-full">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="forgot-email" className="text-xs font-semibold text-zinc-700 ml-1">Email Address</Label>
+                      <div className="relative group">
+                        <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-amber-500" />
+                        <Input id="forgot-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" className="pl-10 h-12 bg-zinc-50/50 border-zinc-200 focus-visible:ring-amber-500 focus-visible:border-amber-500 rounded-xl transition-all shadow-sm text-zinc-900" />
                       </div>
+                    </div>
 
-                      <Button type="submit" disabled={loading || !email} className="w-full h-14 rounded-2xl bg-gradient-brand shadow-glow hover:shadow-elegant text-lg font-bold tracking-wide transition-all duration-300 hover:-translate-y-1 mt-4">
-                        {loading ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : null}
-                        Send Reset Code
-                      </Button>
-                      
-                      <div className="text-center text-sm font-medium text-muted-foreground pt-4">
-                        <button type="button" onClick={() => setMode("login")} className="font-bold text-foreground hover:text-primary transition-colors hover:underline">
-                          Back to Sign In
-                        </button>
+                    <Button type="submit" disabled={loading || !email} className="w-full h-12 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white shadow-md text-sm font-semibold transition-all mt-2">
+                      {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Send Reset Code
+                    </Button>
+                    
+                    <div className="text-center text-sm pt-4">
+                      <button type="button" onClick={() => setMode("login")} className="font-medium text-zinc-500 hover:text-zinc-900 transition-colors">
+                        Back to Sign In
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <form onSubmit={handleResetPassword} className="space-y-5 w-full">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="reset-otp" className="text-xs font-semibold text-zinc-700 ml-1">Verification Code</Label>
+                      <div className="relative group">
+                        <KeyRound className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-amber-500" />
+                        <Input id="reset-otp" type="text" required value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="6-digit code" className="pl-10 h-12 bg-zinc-50/50 border-zinc-200 focus-visible:ring-amber-500 focus-visible:border-amber-500 rounded-xl transition-all shadow-sm text-zinc-900 tracking-widest text-center" />
                       </div>
-                    </form>
-                  ) : (
-                    <form onSubmit={handleResetPassword} className="space-y-5">
-                      <div className="text-center mb-6">
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                          <Lock className="h-8 w-8 text-primary" />
-                        </div>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          Enter the code sent to <span className="font-semibold text-foreground">{email}</span> and your new password.
-                        </p>
-                      </div>
+                    </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="reset-otp" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Verification Code</Label>
-                        <div className="relative group">
-                          <KeyRound className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                          <Input id="reset-otp" type="text" required value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="6-digit code" className="pl-12 h-14 bg-background/50 border-border focus-visible:ring-primary/50 rounded-2xl transition-all shadow-sm text-base tracking-widest text-center" />
-                        </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="new-password" className="text-xs font-semibold text-zinc-700 ml-1">New Password</Label>
+                      <div className="relative group">
+                        <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-amber-500" />
+                        <Input id="new-password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="pl-10 h-12 bg-zinc-50/50 border-zinc-200 focus-visible:ring-amber-500 focus-visible:border-amber-500 rounded-xl transition-all shadow-sm text-zinc-900" />
                       </div>
+                    </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="new-password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">New Password</Label>
-                        <div className="relative group">
-                          <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                          <Input id="new-password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="pl-12 h-14 bg-background/50 border-border focus-visible:ring-primary/50 rounded-2xl transition-all shadow-sm text-base" />
-                        </div>
-                      </div>
-
-                      <Button type="submit" disabled={loading || !otp || !password} className="w-full h-14 rounded-2xl bg-gradient-brand shadow-glow hover:shadow-elegant text-lg font-bold tracking-wide transition-all duration-300 hover:-translate-y-1 mt-4">
-                        {loading ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : null}
-                        Reset Password
-                      </Button>
-                      
-                      <div className="text-center text-sm font-medium text-muted-foreground pt-4">
-                        <button type="button" onClick={() => setMode("login")} className="font-bold text-foreground hover:text-primary transition-colors hover:underline">
-                          Back to Sign In
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </div>
+                    <Button type="submit" disabled={loading || !otp || !password} className="w-full h-12 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white shadow-md text-sm font-semibold transition-all mt-2">
+                      {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Confirm Reset
+                    </Button>
+                    
+                    <div className="text-center text-sm pt-4">
+                      <button type="button" onClick={() => setMode("login")} className="font-medium text-zinc-500 hover:text-zinc-900 transition-colors">
+                        Back to Sign In
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </motion.div>
         </div>
       </div>
