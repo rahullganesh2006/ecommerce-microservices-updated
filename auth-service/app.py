@@ -1,10 +1,6 @@
 from mangum import Mangum
 from fastapi import FastAPI
-from aws_xray_sdk.core import xray_recorder
-from aws_xray_sdk.core import patch_all
 
-patch_all()
-xray_recorder.configure(service='auth-service')
 
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
