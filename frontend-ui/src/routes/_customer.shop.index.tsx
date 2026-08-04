@@ -40,8 +40,8 @@ function CustomerHome() {
 
   const products = response?.data || [];
   
-  const recommended = products.slice(0, 4);
-  const latest = products.slice(4, 8);
+  const recommended = products.slice(0, 12);
+  const latest = products.slice(-12).reverse();
 
   // Dynamically extract unique categories and grab a sample image for each
   const categoriesWithImage = Array.from(new Set(products.map(p => p.category).filter(Boolean))).map(c => {

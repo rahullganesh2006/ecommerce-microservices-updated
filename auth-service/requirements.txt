@@ -7,5 +7,6 @@ requests
 python-dotenv
 
 httpx
+mangum
 
 aws-xray-sdk==2.14.0
