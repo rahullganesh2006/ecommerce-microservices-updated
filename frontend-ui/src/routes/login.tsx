@@ -180,8 +180,10 @@ function LoginPage() {
     }
   }
 
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "100000000000-dummyclientid.apps.googleusercontent.com";
+
   return (
-    <GoogleOAuthProvider clientId="100000000000-dummyclientid.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={googleClientId}>
       <div className="min-h-screen flex bg-[#FAFAF9] font-sans">
         
         {/* Left Side: E-Commerce Branding Showcase */}
