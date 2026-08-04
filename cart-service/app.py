@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
-from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
 
 patch_all()
 xray_recorder.configure(service='cart-service')
@@ -17,8 +16,6 @@ app = FastAPI(
     description="E-Commerce Cart Microservice",
     version="1.0.0"
 )
-
-app.add_middleware(XRayMiddleware, app_name='cart-service')
 
 app.add_middleware(
     CORSMiddleware,

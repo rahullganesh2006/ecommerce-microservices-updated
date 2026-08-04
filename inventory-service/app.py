@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
-from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
 
 patch_all()
 xray_recorder.configure(service='inventory-service')
@@ -16,8 +15,6 @@ app = FastAPI(
     title="Inventory Service",
     version="1.0.0"
 )
-
-app.add_middleware(XRayMiddleware, app_name='inventory-service')
 
 app.add_middleware(
     CORSMiddleware,

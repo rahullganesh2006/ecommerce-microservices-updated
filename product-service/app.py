@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Depends
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
-from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
 
 patch_all()
 xray_recorder.configure(service='product-service')
@@ -17,8 +16,6 @@ app = FastAPI(
     version="1.0.0",
     description="Product Microservice secured using JWT Authentication"
 )
-
-app.add_middleware(XRayMiddleware, app_name='product-service')
 
 app.add_middleware(
     CORSMiddleware,
