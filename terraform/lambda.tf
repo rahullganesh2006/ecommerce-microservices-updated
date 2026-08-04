@@ -20,6 +20,10 @@ resource "aws_lambda_function" "services" {
   timeout       = 30
   memory_size   = 256
 
+  tracing_config {
+    mode = "Active"
+  }
+
   filename         = data.archive_file.dummy_lambda.output_path
   source_code_hash = data.archive_file.dummy_lambda.output_base64sha256
 
