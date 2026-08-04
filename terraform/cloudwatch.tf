@@ -14,9 +14,9 @@ resource "aws_cloudwatch_dashboard" "main_dashboard" {
         height = 6
         properties = {
           metrics = [
-            ["AWS/ApiGateway", "Count", "ApiName", "${var.project_name}-api", { "label": "No. of Requests" }],
-            [".", "4XXError", ".", ".", { "label": "4xx Errors", "color": "#ff7f0e" }],
-            [".", "5XXError", ".", ".", { "label": "5xx Errors", "color": "#d62728" }]
+            ["AWS/ApiGateway", "Count", "ApiName", "${var.project_name}-api", { "label" : "No. of Requests" }],
+            [".", "4XXError", ".", ".", { "label" : "4xx Errors", "color" : "#ff7f0e" }],
+            [".", "5XXError", ".", ".", { "label" : "5xx Errors", "color" : "#d62728" }]
           ]
           view    = "timeSeries"
           stacked = false
@@ -33,7 +33,7 @@ resource "aws_cloudwatch_dashboard" "main_dashboard" {
         height = 6
         properties = {
           metrics = [
-            ["AWS/ApiGateway", "Latency", "ApiName", "${var.project_name}-api", { "label": "Latency (ms)", "stat": "Average" }]
+            ["AWS/ApiGateway", "Latency", "ApiName", "${var.project_name}-api", { "label" : "Latency (ms)", "stat" : "Average" }]
           ]
           view    = "timeSeries"
           stacked = false
