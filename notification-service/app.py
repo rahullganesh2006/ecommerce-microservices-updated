@@ -11,7 +11,6 @@ xray_recorder.configure(service='notification-service')
 from services.queue_consumer import QueueConsumer
 
 app = FastAPI(title="Notification Service")
-app.add_middleware(XRayMiddleware, app_name='notification-service')
 
 
 consumer = QueueConsumer()
@@ -19,6 +18,8 @@ consumer = QueueConsumer()
 @app.on_event("startup")
 async def startup_event():
     asyncio.create_task(consumer.start_polling())
+
+app.add_middleware(XRayMiddleware, app_name='notification-service')
 
 @app.get("/health")
 def health_check():

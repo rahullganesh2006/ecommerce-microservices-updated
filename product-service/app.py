@@ -13,12 +13,13 @@ from mangum import Mangum
 from routers.product_router import router
 
 app = FastAPI(
-app.add_middleware(XRayMiddleware, app_name='product-service')
 
     title="Product Service",
     version="1.0.0",
     description="Product Microservice secured using JWT Authentication"
 )
+
+app.add_middleware(XRayMiddleware, app_name='product-service')
 
 app.add_middleware(
     CORSMiddleware,

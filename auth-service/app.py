@@ -16,12 +16,13 @@ load_dotenv()
 from routers.auth_router import router as auth_router
 
 app = FastAPI(
-app.add_middleware(XRayMiddleware, app_name='auth-service')
 
     title="Auth Service",
     description="E-Commerce Auth Microservice",
     version="1.0.0"
 )
+
+app.add_middleware(XRayMiddleware, app_name='auth-service')
 
 app.add_middleware(
     CORSMiddleware,

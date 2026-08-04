@@ -17,11 +17,12 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 app = FastAPI(
-app.add_middleware(XRayMiddleware, app_name='order-service')
 
     title="Order Service",
     version="1.0.0"
 )
+
+app.add_middleware(XRayMiddleware, app_name='order-service')
 
 app.add_middleware(
     CORSMiddleware,

@@ -12,11 +12,12 @@ from mangum import Mangum
 from routers.payment_router import router
 
 app = FastAPI(
-app.add_middleware(XRayMiddleware, app_name='payment-service')
 
     title="Payment Service",
     version="2.0.0"
 )
+
+app.add_middleware(XRayMiddleware, app_name='payment-service')
 
 app.add_middleware(
     CORSMiddleware,

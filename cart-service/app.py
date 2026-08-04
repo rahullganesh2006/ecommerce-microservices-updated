@@ -12,12 +12,13 @@ from mangum import Mangum
 from routers.cart_router import router as cart_router
 
 app = FastAPI(
-app.add_middleware(XRayMiddleware, app_name='cart-service')
 
     title="Cart Service",
     description="E-Commerce Cart Microservice",
     version="1.0.0"
 )
+
+app.add_middleware(XRayMiddleware, app_name='cart-service')
 
 app.add_middleware(
     CORSMiddleware,

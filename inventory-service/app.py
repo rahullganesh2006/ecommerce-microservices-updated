@@ -12,11 +12,12 @@ from mangum import Mangum
 from routers.inventory_router import router
 
 app = FastAPI(
-app.add_middleware(XRayMiddleware, app_name='inventory-service')
 
     title="Inventory Service",
     version="1.0.0"
 )
+
+app.add_middleware(XRayMiddleware, app_name='inventory-service')
 
 app.add_middleware(
     CORSMiddleware,
