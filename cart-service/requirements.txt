@@ -6,3 +6,5 @@ python-jose[cryptography]
 requests
 httpx
 mangum
+
+aws-xray-sdk==2.14.0

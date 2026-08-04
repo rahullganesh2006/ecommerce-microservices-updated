@@ -1,4 +1,11 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
+from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
+
+patch_all()
+xray_recorder.configure(service='order-service')
+, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from mangum import Mangum
@@ -10,6 +17,8 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 app = FastAPI(
+app.add_middleware(XRayMiddleware, app_name='order-service')
+
     title="Order Service",
     version="1.0.0"
 )

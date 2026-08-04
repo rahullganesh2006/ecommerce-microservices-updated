@@ -7,3 +7,5 @@ requests
 python-dotenv
 
 httpx
+
+aws-xray-sdk==2.14.0
