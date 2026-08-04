@@ -39,7 +39,7 @@ function AdminProducts() {
   const list = products.filter((p) => p.product_name.toLowerCase().includes(q.toLowerCase()) || p.product_id.toLowerCase().includes(q.toLowerCase()));
 
   const [formData, setFormData] = useState({
-    product_id: `P${Math.floor(Math.random() * 10000)}`,
+    product_id: "",
     product_name: "",
     description: "",
     category: "",
@@ -57,6 +57,34 @@ function AdminProducts() {
     stock: "",
     image: "",
   });
+
+  const getNextProductId = () => {
+    if (!products || products.length === 0) return "P1001";
+    
+    const ids = products
+      .map((p: any) => p.product_id)
+      .filter((id: string) => id.startsWith('P'))
+      .map((id: string) => parseInt(id.replace('P', ''), 10))
+      .filter((num: number) => !isNaN(num));
+      
+    if (ids.length === 0) return "P1001";
+    
+    const maxId = Math.max(...ids);
+    return `P${maxId + 1}`;
+  };
+
+  const openNewProductDialog = () => {
+    setFormData({
+      product_id: getNextProductId(),
+      product_name: "",
+      description: "",
+      category: "",
+      price: "",
+      stock: "",
+      image: "",
+    });
+    setIsDialogOpen(true);
+  };
 
   const createProductMutation = useMutation({
     mutationFn: async () => {
@@ -87,7 +115,7 @@ function AdminProducts() {
       toast.success("Product created successfully!");
       setIsDialogOpen(false);
       setFormData({
-        product_id: `P${Math.floor(Math.random() * 10000)}`,
+        product_id: "",
         product_name: "",
         description: "",
         category: "",
@@ -183,9 +211,7 @@ function AdminProducts() {
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-brand"><Plus className="mr-1.5 h-4 w-4" /> New product</Button>
-          </DialogTrigger>
+          <Button onClick={openNewProductDialog} className="bg-gradient-brand"><Plus className="mr-1.5 h-4 w-4" /> New product</Button>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Add New Product</DialogTitle>
@@ -196,7 +222,7 @@ function AdminProducts() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1">
                 <Label>Product ID (SKU)</Label>
-                <Input value={formData.product_id} onChange={e => setFormData({...formData, product_id: e.target.value})} required />
+                <Input value={formData.product_id} disabled className="bg-muted text-muted-foreground" required />
               </div>
               <div className="space-y-1">
                 <Label>Name</Label>
