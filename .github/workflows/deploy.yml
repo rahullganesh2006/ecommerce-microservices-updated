@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy-backend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Self hosted nodes 
     strategy:
       matrix:
         service: [auth-service, cart-service, inventory-service, notification-service, order-service, payment-service, product-service]
@@ -26,6 +26,8 @@ jobs:
         cd ${{ matrix.service }}
         mkdir -p package
         pip install --platform manylinux2014_x86_64 --target=package --implementation cp --python-version 3.11 --only-binary=:all: --upgrade -r requirements.txt
+        rm -rf package/botocore
+        rm -rf package/boto3
         cp -r *.py package/ || true
         cp -r routers package/ || true
         cp -r schemas package/ || true
