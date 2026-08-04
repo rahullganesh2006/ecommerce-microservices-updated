@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/auth-store";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { cognitoLogin } from "@/lib/cognito-auth";
 import { signUp, confirmSignUp, resetPassword, confirmResetPassword } from "aws-amplify/auth";
+import { API } from "@/api/config";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -162,7 +163,7 @@ function LoginPage() {
   async function handleGoogleSuccess(credentialResponse: any) {
     setLoading(true);
     try {
-      const authApi = import.meta.env.VITE_AUTH_API || "http://localhost:8005";
+      const authApi = API.AUTH || "http://localhost:8005";
       const res = await fetch(`${authApi}/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
