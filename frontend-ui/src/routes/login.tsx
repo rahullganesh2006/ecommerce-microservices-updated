@@ -162,7 +162,8 @@ function LoginPage() {
   async function handleGoogleSuccess(credentialResponse: any) {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8005/auth/google", {
+      const authApi = import.meta.env.VITE_AUTH_API || "http://localhost:8005";
+      const res = await fetch(`${authApi}/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: credentialResponse.credential })
