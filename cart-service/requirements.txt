@@ -2,7 +2,7 @@ fastapi
 uvicorn
 boto3
 python-dotenv
-python-jose[cryptography]
+python-jose
 requests
 httpx
 mangum

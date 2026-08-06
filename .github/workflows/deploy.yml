@@ -28,6 +28,7 @@ jobs:
         pip install --platform manylinux2014_x86_64 --target=package --implementation cp --python-version 3.11 --only-binary=:all: --upgrade -r requirements.txt
         rm -rf package/botocore
         rm -rf package/boto3
+        rm -rf package/botocore
         cp -r *.py package/ || true
         cp -r routers package/ || true
         cp -r schemas package/ || true

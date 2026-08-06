@@ -5,6 +5,6 @@ mangum==0.19.0
 python-dotenv==1.1.1
 pydantic==2.11.7
 httpx==0.28.1
-python-jose[cryptography]
+python-jose
 requests
 aws-xray-sdk==2.14.0
