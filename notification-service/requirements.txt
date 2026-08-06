@@ -4,3 +4,4 @@ pydantic==2.10.4
 boto3==1.35.91
 
 aws-xray-sdk==2.14.0
+

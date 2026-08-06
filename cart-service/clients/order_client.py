@@ -6,7 +6,7 @@ from fastapi import HTTPException
 
 load_dotenv()
 
-ORDER_SERVICE_URL = os.getenv("ORDER_SERVICE_URL", "http://localhost:8003")
+ORDER_SERVICE_URL = os.getenv("ORDER_SERVICE_URL", "https://109pcwez22.execute-api.us-east-1.amazonaws.com/v1")
 
 
 class OrderClient:

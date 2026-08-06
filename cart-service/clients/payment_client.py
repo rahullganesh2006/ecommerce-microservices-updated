@@ -6,7 +6,7 @@ from fastapi import HTTPException
 
 load_dotenv()
 
-PAYMENT_SERVICE_URL = os.getenv("PAYMENT_SERVICE_URL", "http://localhost:8004")
+PAYMENT_SERVICE_URL = os.getenv("PAYMENT_SERVICE_URL", "https://109pcwez22.execute-api.us-east-1.amazonaws.com/v1")
 
 
 class PaymentClient:

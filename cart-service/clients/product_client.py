@@ -6,7 +6,7 @@ from fastapi import HTTPException
 
 load_dotenv()
 
-PRODUCT_SERVICE_URL = os.getenv("PRODUCT_SERVICE_URL", "http://localhost:8000")
+PRODUCT_SERVICE_URL = os.getenv("PRODUCT_SERVICE_URL", "https://109pcwez22.execute-api.us-east-1.amazonaws.com/v1")
 
 
 class ProductClient:
