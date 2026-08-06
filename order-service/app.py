@@ -1,6 +1,5 @@
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
-from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
 
 patch_all()
 xray_recorder.configure(service='order-service')
@@ -68,5 +67,4 @@ def health():
 
 app.include_router(router)
 
-app.add_middleware(XRayMiddleware, app_name='order-service')
 handler = Mangum(app, lifespan="off", api_gateway_base_path="/v1")
