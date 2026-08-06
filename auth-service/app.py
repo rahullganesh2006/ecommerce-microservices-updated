@@ -1,5 +1,12 @@
 from mangum import Mangum
 from fastapi import FastAPI
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
+from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
+
+patch_all()
+xray_recorder.configure(service='auth-service')
+
 
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +18,8 @@ load_dotenv()
 from routers.auth_router import router as auth_router
 
 app = FastAPI(
+app.add_middleware(XRayMiddleware, app_name='auth-service')
+
 
     title="Auth Service",
     description="E-Commerce Auth Microservice",

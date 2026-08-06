@@ -1,6 +1,13 @@
 from fastapi import FastAPI
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
+from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
+
+patch_all()
+xray_recorder.configure(service='cart-service')
+
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
 
 patch_all()
 xray_recorder.configure(service='cart-service')
@@ -11,6 +18,8 @@ from mangum import Mangum
 from routers.cart_router import router as cart_router
 
 app = FastAPI(
+app.add_middleware(XRayMiddleware, app_name='cart-service')
+
 
     title="Cart Service",
     description="E-Commerce Cart Microservice",

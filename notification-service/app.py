@@ -3,6 +3,13 @@ import asyncio
 from fastapi import FastAPI
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
+from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
+
+patch_all()
+xray_recorder.configure(service='notification-service')
+
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
 
 patch_all()
 xray_recorder.configure(service='notification-service')
@@ -10,6 +17,8 @@ xray_recorder.configure(service='notification-service')
 from services.queue_consumer import QueueConsumer
 
 app = FastAPI(title="Notification Service")
+app.add_middleware(XRayMiddleware, app_name='notification-service')
+
 
 
 consumer = QueueConsumer()
