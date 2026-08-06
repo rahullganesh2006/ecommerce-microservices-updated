@@ -1,5 +1,3 @@
-from mangum import Mangum
-from fastapi import FastAPI
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
@@ -7,6 +5,8 @@ from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
 patch_all()
 xray_recorder.configure(service='auth-service')
 
+from mangum import Mangum
+from fastapi import FastAPI
 
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,8 +18,6 @@ load_dotenv()
 from routers.auth_router import router as auth_router
 
 app = FastAPI(
-app.add_middleware(XRayMiddleware, app_name='auth-service')
-
 
     title="Auth Service",
     description="E-Commerce Auth Microservice",
@@ -50,4 +48,5 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8005)
 
 
+app.add_middleware(XRayMiddleware, app_name='auth-service')
 handler = Mangum(app, lifespan="off", api_gateway_base_path="/v1")

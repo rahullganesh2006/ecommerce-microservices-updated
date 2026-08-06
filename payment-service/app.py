@@ -1,4 +1,3 @@
-from fastapi import FastAPI
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
@@ -6,6 +5,7 @@ from aws_xray_sdk.ext.fastapi.middleware import XRayMiddleware
 patch_all()
 xray_recorder.configure(service='payment-service')
 
+from fastapi import FastAPI
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
@@ -18,8 +18,6 @@ from mangum import Mangum
 from routers.payment_router import router
 
 app = FastAPI(
-app.add_middleware(XRayMiddleware, app_name='payment-service')
-
 
     title="Payment Service",
     version="2.0.0"
@@ -49,4 +47,5 @@ def health():
 
 app.include_router(router)
 
+app.add_middleware(XRayMiddleware, app_name='payment-service')
 handler = Mangum(app, lifespan="off", api_gateway_base_path="/v1")
