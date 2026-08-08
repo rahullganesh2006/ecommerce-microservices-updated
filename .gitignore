@@ -105,3 +105,6 @@ response.json
 scratch/
 
 terraform/terraform.tfvars
+# Node / Frontend
+node_modules/
+.amplify-hosting/
