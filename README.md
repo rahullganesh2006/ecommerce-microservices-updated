@@ -41,6 +41,11 @@ We have fully automated CI/CD pipelines split across our stack:
 - **Frontend (AWS Amplify):** Pushes to the `main` branch automatically trigger AWS Amplify to read `amplify.yml`, install dependencies, run the Vite build, and deploy to the global CDN.
 - **Backend (GitHub Actions):** Pushes to `main` trigger a massive **Matrix Deployment** (`deploy.yml`). GitHub Actions concurrently builds all 7 microservices using `manylinux2014_x86_64` (to ensure binary compatibility with AWS Lambda's Amazon Linux OS). To avoid AWS's 50MB direct-upload limit, the pipeline strips out natively provided libraries (like `botocore` and `boto3`) before zipping and deploying via the AWS CLI.
 
+### 4. DevSecOps (SonarQube & Snyk)
+A dedicated `security.yml` GitHub Actions workflow runs on every push and pull request to ensure high code quality and security:
+- **Static Application Security Testing (SAST):** Uses **SonarCloud/SonarQube** to analyze all Python microservices for code smells, bugs, and security hotspots.
+- **Software Composition Analysis (SCA):** Uses **Snyk** in a matrix strategy to scan the `requirements.txt` of all 7 microservices for known vulnerable dependencies (CVEs).
+
 ---
 
 ## 🛠️ Tech Stack
